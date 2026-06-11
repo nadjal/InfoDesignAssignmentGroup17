@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block title %}Gemeinde-Explorer – Binnenmigration Österreich{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="gem-section container">
+  <div class="page-title" style="text-align:left;">Gemeinde-Explorer</div>
+  <div class="page-sub" style="text-align:left; margin-bottom:1rem;">Wanderungsbewegungen für eine einzelne Gemeinde</div>
+  {% if content_intro %}
+  <div class="prose" style="margin-bottom:1.5rem;">{{ content_intro | safe }}</div>
+  {% endif %}
+  <p class="gem-map-label">Wähle deine Gemeinde auf der Karte aus</p>
+
+  <!-- Gemeinde-Choropleth-Karte -->
+  <div class="gem-map-wrap">
+    <div id="gem-map"></div>
+    <div id="gem-map-legend" class="gem-map-legend"></div>
+    <div id="gem-map-tooltip" class="chart-tooltip"></div>
+  </div>
+
+  <p class="gem-map-label">Oder suche direkt nach deiner Gemeinde</p>
+
+  <div class="search-wrap gem-search-wrap">
+    <input type="text" id="gemeinde-input" class="search-input"
+           placeholder="Gemeindenamen eingeben …" autocomplete="off">
+    <div id="search-dropdown" class="search-dropdown"></div>
+  </div>
+</div>
+
+<div class="content" style="padding-top:0;">
+  <div class="container">
+
+    <div id="gemeinde-results" style="display:none;">
+        <div class="year-bar" style="margin-bottom:1.25rem;">
+            <div class="container">
+                <div class="year-bar-inner">
+                    <span class="control-label">Jahr</span>
+                    <button class="year-step-btn" id="gem-btn-prev" title="Vorheriges Jahr">‹</button>
+                    <span class="year-display" id="gem-year-display">—</span>
+                    <input type="range" id="gem-year-slider" class="year-range" min="0" max="0" value="0">
+                    <button class="year-step-btn" id="gem-btn-next" title="Nächstes Jahr">›</button>
+                    <button class="year-play-btn" id="gem-btn-play" title="Animation">▶</button>
+                    <button class="chip chip-btn" id="gem-btn-all">Alle Jahre</button>
+                </div>
+            </div>
+        </div>
+
+      <div class="section grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Wohin ziehen Personen?</div>
+              <div class="card-subtitle" id="nach-subtitle">Top-5 Zielgemeinden (alle Jahre)</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Gemeinde</th>
+                <th>Bundesland</th>
+                <th class="num">Anzahl</th>
+              </tr></thead>
+              <tbody id="top-nach-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Woher kommen Personen?</div>
+              <div class="card-subtitle" id="von-subtitle">Top-5 Quellgemeinden (alle Jahre)</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Gemeinde</th>
+                <th>Bundesland</th>
+                <th class="num">Anzahl</th>
+              </tr></thead>
+              <tbody id="top-von-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Piktogramm -->
+      <div id="pictogram-wrap" class="pict-wrap"></div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let gemeinden = [];
+  let activeGkz  = null;
+  let activeName = null;
+  let gemYear    = null;
+  let gemYears   = [];
+
+  async function initSearch() {
+    gemeinden = await fetchJSON('/api/gemeinden');
+    gemYears = await fetchJSON('/api/years');
+
+    initYearSlider({
+      years:     gemYears,
+      sliderId:  'gem-year-slider',
+      displayId: 'gem-year-display',
+      btnAllId:  'gem-btn-all',
+      btnPrevId: 'gem-btn-prev',
+      btnNextId: 'gem-btn-next',
+      btnPlayId: 'gem-btn-play',
+      onChange:  (year) => {
+        gemYear = year;
+        if (window.updateGemMapYear) updateGemMapYear(year);
+        if (activeGkz) loadGemeinde(activeGkz, activeName);
+      },
+    });
+
+    const input    = document.getElementById('gemeinde-input');
+    const dropdown = document.getElementById('search-dropdown');
+
+    input.addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      dropdown.innerHTML = '';
+      dropdown.classList.remove('open');
+      if (q.length < 2) return;
+
+      const matches = gemeinden
+        .filter(g => g.name && g.name.toLowerCase().includes(q))
+        .slice(0, 10);
+      if (!matches.length) return;
+
+      matches.forEach(g => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `<span class="di-name">${g.name}</span><span class="di-bl">${g.bundesland || ''}</span>`;
+        item.addEventListener('click', () => {
+          input.value = g.name;
+          dropdown.classList.remove('open');
+          dropdown.innerHTML = '';
+          activeGkz  = g.gkz;
+          activeName = g.name;
+          if (window.highlightGemeindeOnMap) highlightGemeindeOnMap(g.gkz);
+          loadGemeinde(g.gkz, g.name);
+        });
+        dropdown.appendChild(item);
+      });
+      dropdown.classList.add('open');
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-wrap')) dropdown.classList.remove('open');
+    });
+  }
+
+  async function loadGemeinde(gkz, name) {
+    const url  = `/api/gemeinde_top?gkz=${gkz}${gemYear ? '&year=' + gemYear : ''}`;
+    const data = await fetchJSON(url);
+    const yearLabel = gemYear ? `Jahr ${gemYear}` : 'alle Jahre';
+
+    document.getElementById('nach-subtitle').textContent = `Top-5 Zielgemeinden für ${name} (${yearLabel})`;
+    document.getElementById('von-subtitle').textContent  = `Top-5 Quellgemeinden für ${name} (${yearLabel})`;
+    document.getElementById('top-nach-body').innerHTML   = renderTopRows(data.top_nach);
+    document.getElementById('top-von-body').innerHTML    = renderTopRows(data.top_von);
+    document.getElementById('gemeinde-results').style.display = 'block';
+    renderPictogram(data.top_von, data.top_nach);
+  }
+
+  function renderPictogram(top_von, top_nach) {
+    const wrap = document.getElementById('pictogram-wrap');
+    if (!wrap) return;
+
+    const GREEN = ['#193808','#2f5c13','#4d9221','#72bc35','#b8e896'];
+    const PINK  = ['#540a36','#8b1258','#c51b7d','#e967b4','#f9b2dc'];
+
+    const totalZ = top_von.reduce( (s,r) => s + r.anzahl, 0);
+    const totalW = top_nach.reduce((s,r) => s + r.anzahl, 0);
+
+    const IW = 64, IH = 92, GAP_X = 16, GAP_Y = 20;
+    const cellW = IW + GAP_X;
+    const rowH  = IH + GAP_Y;
+    const ICONS_PER_ROW = 6;
+    const GAP_BL     = 10;
+    const GAP_CENTER = 36;
+    const sideW      = ICONS_PER_ROW * cellW;
+
+    function buildData(rows, total, shades) {
+      return rows.map((r, i) => {
+        const pct = total > 0 ? r.anzahl / total * 100 : 0;
+        const raw = pct / 5;
+        return { color: shades[Math.min(i, shades.length-1)],
+                 pct, full: Math.floor(raw), frac: raw - Math.floor(raw), label: r.name };
+      });
+    }
+
+    const totalAll = totalZ + totalW;
+    const zData = buildData(top_von,  totalAll, GREEN);
+    const wData = buildData(top_nach, totalAll, PINK);
+
+    function computeBlocks(data) {
+      let y = 0;
+      return data.map(row => {
+        const nIcons   = row.full + (row.frac > 0.05 ? 1 : 0);
+        const nSubRows = Math.max(1, Math.ceil(nIcons / ICONS_PER_ROW));
+        const blockH   = nSubRows * rowH;
+        const block    = { ...row, y, blockH };
+        y += blockH + GAP_BL;
+        return block;
+      });
+    }
+
+    const wBlocks = computeBlocks(wData);
+    const zBlocks = computeBlocks(zData);
+    const wTotalH = wBlocks.reduce((s,b) => s + b.blockH + GAP_BL, 0);
+    const zTotalH = zBlocks.reduce((s,b) => s + b.blockH + GAP_BL, 0);
+    const svgH = Math.max(wTotalH, zTotalH) + 22;
+    const svgW = sideW * 2 + GAP_CENTER;
+    let defs = '', elems = '', clipN = 0;
+
+    /* natural icon size: 14 wide × 20 tall */
+    const ICON_NW = 14, ICON_NH = 20;
+    const scaleX = IW / ICON_NW, scaleY = IH / ICON_NH;
+
+    function personAt(x, y, color, frac, fromRight = false) {
+      const body = `<circle cx="7" cy="3.5" r="3.5"/>
+        <path d="M2,8 Q0,9 0,15 L4,15 L4,20 L10,20 L10,15 L14,15 Q14,9 12,8 Z"/>`;
+      const scale = `scale(${scaleX},${scaleY})`;
+      if (frac >= 1) {
+        elems += `<g transform="translate(${x},${y})" fill="${color}"><g transform="${scale}">${body}</g></g>`;
+      } else {
+        const id = `pc${clipN++}`;
+        const cx = fromRight ? (IW*(1-frac)).toFixed(2) : '0';
+        const cw = (frac*IW).toFixed(2);
+        defs  += `<clipPath id="${id}"><rect x="${cx}" y="0" width="${cw}" height="${IH}"/></clipPath>`;
+        elems += `<g transform="translate(${x},${y})" fill="${color}" clip-path="url(#${id})"><g transform="${scale}">${body}</g></g>`;
+      }
+    }
+
+    const lineX    = sideW + GAP_CENTER / 2;
+    const leftEdge  = sideW;
+    const rightEdge = sideW + GAP_CENTER;
+
+    wBlocks.forEach(block => {
+      let n = 0;
+      for (let i = 0; i < block.full; i++, n++) {
+        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(leftEdge - (pos+1)*cellW, block.y + sr*rowH, block.color, 1);
+      }
+      if (block.frac > 0.05) {
+        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(leftEdge - (pos+1)*cellW, block.y + sr*rowH, block.color, block.frac, true);
+      }
+    });
+
+    zBlocks.forEach(block => {
+      let n = 0;
+      for (let i = 0; i < block.full; i++, n++) {
+        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(rightEdge + pos*cellW, block.y + sr*rowH, block.color, 1);
+      }
+      if (block.frac > 0.05) {
+        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(rightEdge + pos*cellW, block.y + sr*rowH, block.color, block.frac, false);
+      }
+    });
+
+    wrap.innerHTML = `
+      <div class="pict-header">
+        <span class="pict-title" style="color:#c51b7d">Wegzüge: ${totalW.toLocaleString('de-AT')}</span>
+        <span class="pict-title" style="color:#4d9221">Zuzüge: ${totalZ.toLocaleString('de-AT')}</span>
+      </div>
+      <div class="pict-body">
+        <svg class="pict-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+          <defs>${defs}</defs>
+          ${elems}
+          <line x1="${lineX}" y1="0" x2="${lineX}" y2="${svgH-20}"
+                stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+          <text x="${svgW/2}" y="${svgH-4}" text-anchor="middle"
+                fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 Figur = 5 %</text>
+        </svg>
+      </div>`;
+
+    requestAnimationFrame(() => {
+      const bodyEl  = wrap.querySelector('.pict-body');
+      const svgEl   = wrap.querySelector('svg');
+      const svgRect  = svgEl.getBoundingClientRect();
+      const bodyRect = bodyEl.getBoundingClientRect();
+      const scale    = svgRect.width / svgW;
+      const svgLeft  = svgRect.left - bodyRect.left;
+      const svgRight = bodyRect.right - svgRect.right;
+
+      wBlocks.forEach(block => {
+        const el = document.createElement('div');
+        el.className = 'pict-block-name pict-block-name--left';
+        el.textContent = block.label;
+        el.style.top   = ((block.y + block.blockH / 2) * scale) + 'px';
+        el.style.width = Math.max(svgLeft - 8, 0) + 'px';
+        bodyEl.appendChild(el);
+      });
+
+      zBlocks.forEach(block => {
+        const el = document.createElement('div');
+        el.className = 'pict-block-name pict-block-name--right';
+        el.textContent = block.label;
+        el.style.top   = ((block.y + block.blockH / 2) * scale) + 'px';
+        el.style.width = Math.max(svgRight - 8, 0) + 'px';
+        bodyEl.appendChild(el);
+      });
+    });
+  }
+
+  function renderTopRows(rows) {
+    if (!rows.length) return '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Keine Daten</td></tr>';
+    return rows.map((r, i) => `
+      <tr>
+        <td><span class="rank">${i + 1}</span> ${r.name || '—'}</td>
+        <td style="color:var(--text-muted)">${r.bundesland || '—'}</td>
+        <td class="num bold">${fmt(r.anzahl)}</td>
+      </tr>
+    `).join('');
+  }
+
+  initSearch();
+
+  /* ── Gemeinde-Choropleth-Karte ─────────────────────────────── */
+  (async function initGemMap() {
+    const COLOR_NEG = '#c51b7d';
+    const COLOR_MID = '#f7f7f7';
+    const COLOR_POS = '#4d9221';
+
+    function lerpColor(a, b, t) {
+      const h = s => parseInt(s, 16);
+      const r = c => c.slice(1);
+      const lerp = (x, y) => Math.round(x + (y - x) * t);
+      return '#' + ['rr','gg','bb'].map((_, i) => {
+        const ai = h(r(a).slice(i*2, i*2+2));
+        const bi = h(r(b).slice(i*2, i*2+2));
+        return lerp(ai, bi).toString(16).padStart(2, '0');
+      }).join('');
+    }
+
+    const [geo, choro] = await Promise.all([
+      fetchJSON('/static/geojson/gemeinden_999_geo.json'),
+      fetchJSON('/api/choropleth?level=gemeinden&year=2023'),
+    ]);
+
+    const dataMap    = Object.fromEntries(choro.map(d => [d.iso, d]));
+    const featureMap = Object.fromEntries(geo.features.map(f => [String(f.properties.iso), f]));
+    const nettos  = choro.map(d => d.netto);
+    const dataMin = Math.min(...nettos);
+    const dataMax = Math.max(...nettos);
+
+    function gemColor(netto) {
+      if (netto <= 0 && dataMin < 0)
+        return lerpColor(COLOR_MID, COLOR_NEG, Math.min(1, netto / dataMin));
+      if (netto > 0 && dataMax > 0)
+        return lerpColor(COLOR_MID, COLOR_POS, Math.min(1, netto / dataMax));
+      return COLOR_MID;
+    }
+
+    const map = L.map('gem-map', {
+      zoomControl: true,
+      attributionControl: false,
+      dragging: true,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      touchZoom: true,
+      keyboard: true,
+    });
+
+    const initialBounds = [[46.38, 9.6], [48.85, 17.1]];
+    const initialPad    = { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10] };
+
+    map.fitBounds(initialBounds, initialPad);
+    map.setMinZoom(map.getZoom());
+
+    /* Zurückzoomen → neu zentrieren */
+    map.on('zoomend', function () {
+      if (map.getZoom() <= map.getMinZoom()) {
+        map.fitBounds(initialBounds, initialPad);
+      }
+    });
+
+    const tip = document.getElementById('gem-map-tooltip');
+    let _highlightLayer = null;
+
+    window.highlightGemeindeOnMap = function (gkz) {
+      const iso = String(gkz);
+      const f   = featureMap[iso];
+      const d   = dataMap[iso];
+      if (f && d) highlightGemeinde(f, d.netto);
+    };
+
+    function highlightGemeinde(feature, netto) {
+      if (_highlightLayer) { map.removeLayer(_highlightLayer); _highlightLayer = null; }
+      _highlightLayer = L.geoJSON(feature, {
+        renderer: L.svg(),
+        style: {
+          fillColor:   gemColor(netto),
+          fillOpacity: 1,
+          color:       '#ffffff',
+          weight:      2,
+          className:   'gem-highlight',
+        },
+        interactive: false,
+      }).addTo(map);
+    }
+
+    let currentDataMap = dataMap;
+
+    function styleFeature(f) {
+      const iso = String(f.properties.iso);
+      const d   = currentDataMap[iso];
+      return {
+        fillColor:   d ? gemColor(d.netto) : COLOR_MID,
+        fillOpacity: 0.85,
+        color:       'rgba(0,0,0,0.15)',
+        weight:      0.3,
+      };
+    }
+
+    const geojsonLayer = L.geoJSON(geo, {
+      renderer: L.canvas(),
+      style: styleFeature,
+      onEachFeature(f, layer) {
+        const iso = String(f.properties.iso);
+        layer.on('mouseover', function (e) {
+          const d = currentDataMap[iso];
+          if (!d) return;
+          const sign = d.netto >= 0 ? '+' : '';
+          tip.innerHTML = `<strong>${d.name || f.properties.name}</strong><br>Netto: ${sign}${d.netto.toLocaleString('de-AT')}`;
+          tip.style.opacity = '1';
+        });
+        layer.on('mousemove', function (e) {
+          const rect = document.getElementById('gem-map').getBoundingClientRect();
+          tip.style.left = (e.originalEvent.clientX - rect.left + 14) + 'px';
+          tip.style.top  = (e.originalEvent.clientY - rect.top  - 36) + 'px';
+        });
+        layer.on('mouseout', () => { tip.style.opacity = '0'; });
+        layer.on('click', function () {
+          const d = currentDataMap[iso];
+          if (!d) return;
+          const name = d.name || f.properties.name;
+          const input = document.getElementById('gemeinde-input');
+          if (input) input.value = name;
+          activeGkz  = iso;
+          activeName = name;
+          highlightGemeinde(f, d.netto);
+          loadGemeinde(iso, name);
+        });
+      },
+    }).addTo(map);
+
+    window.updateGemMapYear = async function (year) {
+      const url = year
+        ? `/api/choropleth?level=gemeinden&year=${year}`
+        : '/api/choropleth?level=gemeinden&year=2023';
+      const newChoro = await fetchJSON(url);
+      currentDataMap = Object.fromEntries(newChoro.map(d => [d.iso, d]));
+      geojsonLayer.setStyle(styleFeature);
+    };
+
+    /* Legende */
+    const zeroPos = ((-dataMin / (dataMax - dataMin)) * 100).toFixed(1);
+    const legend  = document.getElementById('gem-map-legend');
+    const fmtL    = n => n.toLocaleString('de-AT');
+    legend.innerHTML =
+      `<span>${fmtL(dataMin)}</span>` +
+      `<span class="leg-grad" style="background:linear-gradient(to right,${COLOR_NEG} 0%,${COLOR_MID} ${zeroPos}%,${COLOR_POS} 100%)"></span>` +
+      `<span>+${fmtL(dataMax)}</span>`;
+  })();
+</script>
+{% endblock %}

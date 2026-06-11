@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Explorer – Binnenmigration Österreich{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <div class="page-title">Daten-Explorer</div>
+    <div class="page-sub">Filtere und durchsuche alle Wanderungsdaten auf Gemeindeebene</div>
+  </div>
+</div>
+
+{% if content_intro %}
+<div class="content" style="padding-bottom:0;">
+  <div class="container">
+    <div class="prose">{{ content_intro | safe }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="content" style="padding-top:0;">
+  <div class="container">
+
+    <div class="card" style="margin-bottom:1.25rem;">
+      <div class="card-header"><div class="card-title">Filter</div></div>
+      <div class="card-body">
+        <div class="filters">
+          <select id="f-year"     class="filter-select"><option value="">Alle Jahre</option></select>
+          <select id="f-von-bl"   class="filter-select"><option value="">Von: Alle Bundesländer</option></select>
+          <select id="f-nach-bl"  class="filter-select"><option value="">Nach: Alle Bundesländer</option></select>
+          <select id="f-geschl"   class="filter-select"><option value="">Alle Geschlechter</option></select>
+          <select id="f-staat"    class="filter-select"><option value="">Alle Staatsbürgerschaften</option></select>
+          <button class="btn-primary" onclick="applyFilters()">Filtern</button>
+          <button class="btn-ghost"   onclick="resetFilters()">Zurücksetzen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div class="card-title">Ergebnisse</div>
+          <div class="card-subtitle" id="result-info">—</div>
+        </div>
+        <a id="csv-link" class="btn-ghost btn-sm" href="/api/explorer/csv" download>CSV herunterladen</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Jahr</th>
+              <th>Von Gemeinde</th>
+              <th>Von Bezirk</th>
+              <th>Von Bundesland</th>
+              <th>Nach Gemeinde</th>
+              <th>Nach Bezirk</th>
+              <th>Nach Bundesland</th>
+              <th>Geschlecht</th>
+              <th>Staatsbürgerschaft</th>
+              <th class="num">Anzahl</th>
+            </tr>
+          </thead>
+          <tbody id="explorer-body">
+            <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:3rem 0;">
+              Filter setzen und auf "Filtern" klicken
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination" style="display:none;">
+        <span class="page-info" id="page-info"></span>
+        <div class="page-buttons">
+          <button class="page-btn" id="btn-prev" onclick="changePage(-1)">&#8592;</button>
+          <span class="page-cur" id="page-cur">1</span>
+          <button class="page-btn" id="btn-next" onclick="changePage(+1)">&#8594;</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let currentPage = 1;
+  const PER_PAGE = 50;
+  let totalRows = 0;
+
+  async function loadFilters() {
+    const data = await fetchJSON('/api/filters');
+    const years = await fetchJSON('/api/years');
+
+    populateSelect('f-year', years.map(y => ({ value: y, label: y })));
+    populateSelect('f-von-bl',  data.bundeslaender.map(b => ({ value: b, label: b })));
+    populateSelect('f-nach-bl', data.bundeslaender.map(b => ({ value: b, label: b })));
+    populateSelect('f-geschl',  data.geschlechter.map(g => ({ value: g, label: g })));
+    populateSelect('f-staat',   data.staatsbuergerschaft.map(s => ({ value: s, label: s })));
+  }
+
+  function populateSelect(id, options) {
+    const sel = document.getElementById(id);
+    const first = sel.options[0];
+    sel.innerHTML = '';
+    sel.appendChild(first);
+    options.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.value;
+      opt.textContent = o.label;
+      sel.appendChild(opt);
+    });
+  }
+
+  function buildParams(page = 1) {
+    const params = new URLSearchParams();
+    const map = {
+      'f-year': 'year', 'f-von-bl': 'von_bl', 'f-nach-bl': 'nach_bl',
+      'f-geschl': 'geschlecht', 'f-staat': 'staatsbuergerschaft'
+    };
+    for (const [id, key] of Object.entries(map)) {
+      const v = document.getElementById(id).value;
+      if (v) params.set(key, v);
+    }
+    params.set('page', page);
+    params.set('per_page', PER_PAGE);
+    return params;
+  }
+
+  async function applyFilters() {
+    currentPage = 1;
+    await loadData();
+    updateCsvLink();
+  }
+
+  async function loadData() {
+    const params = buildParams(currentPage);
+    const data = await fetchJSON(`/api/explorer?${params}`);
+    totalRows = data.total;
+
+    document.getElementById('result-info').textContent =
+      `${fmt(data.total)} Einträge gefunden`;
+
+    const tbody = document.getElementById('explorer-body');
+    if (data.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:3rem 0;">Keine Daten für diese Filter</td></tr>';
+      document.getElementById('pagination').style.display = 'none';
+      return;
+    }
+
+    tbody.innerHTML = data.data.map(r => `
+      <tr>
+        <td>${r.jahr}</td>
+        <td>${r.von_gemeinde || '—'}</td>
+        <td>${r.von_bezirk  || '—'}</td>
+        <td>${r.von_bundesland || '—'}</td>
+        <td>${r.nach_gemeinde || '—'}</td>
+        <td>${r.nach_bezirk  || '—'}</td>
+        <td>${r.nach_bundesland || '—'}</td>
+        <td>${r.geschlecht || '—'}</td>
+        <td>${r.staatsbuergerschaft || '—'}</td>
+        <td class="num bold">${fmt(r.anzahl)}</td>
+      </tr>
+    `).join('');
+
+    const totalPages = Math.ceil(totalRows / PER_PAGE);
+    document.getElementById('page-info').textContent =
+      `Seite ${currentPage} von ${totalPages}`;
+    document.getElementById('page-cur').textContent = currentPage;
+    document.getElementById('btn-prev').disabled = currentPage <= 1;
+    document.getElementById('btn-next').disabled = currentPage >= totalPages;
+    document.getElementById('pagination').style.display = 'flex';
+  }
+
+  function changePage(delta) {
+    currentPage = Math.max(1, currentPage + delta);
+    loadData();
+  }
+
+  function resetFilters() {
+    ['f-year', 'f-von-bl', 'f-nach-bl', 'f-geschl', 'f-staat'].forEach(id => {
+      document.getElementById(id).selectedIndex = 0;
+    });
+    document.getElementById('explorer-body').innerHTML =
+      '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:3rem 0;">Filter setzen und auf "Filtern" klicken</td></tr>';
+    document.getElementById('result-info').textContent = '—';
+    document.getElementById('pagination').style.display = 'none';
+    updateCsvLink();
+  }
+
+  function updateCsvLink() {
+    const params = buildParams(1);
+    params.delete('page');
+    params.delete('per_page');
+    document.getElementById('csv-link').href = `/api/explorer/csv?${params}`;
+  }
+
+  loadFilters();
+</script>
+{% endblock %}

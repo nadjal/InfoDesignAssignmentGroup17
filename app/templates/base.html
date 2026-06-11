@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Binnenmigration Österreich{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="navbar-brand">
+        <span class="brand-mark"></span>
+        Binnenmigration <span class="brand-at">AT</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/"         class="nav-link {% if request.endpoint == 'main.index'    %}active{% endif %}">Überblick</a></li>
+        <li><a href="/karte"    class="nav-link {% if request.endpoint == 'main.karte'    %}active{% endif %}">Karte</a></li>
+        <li><a href="/gemeinde" class="nav-link {% if request.endpoint == 'main.gemeinde' %}active{% endif %}">Gemeinde-Explorer</a></li>
+        <li><a href="/explorer" class="nav-link {% if request.endpoint == 'main.explorer' %}active{% endif %}">Daten-Explorer</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Daten: <a href="https://www.statistik.at" target="_blank" rel="noopener">Statistik Austria</a>
+         &middot; Visualisierung: Binnenmigration Österreich</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

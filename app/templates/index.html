@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Überblick – Binnenmigration Österreich{% endblock %}
+
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      Statistik Austria &middot; Österreich
+    </div>
+    <h1>Wohin wandert <em>Österreich</em>?</h1>
+    <p class="hero-sub">
+      Interaktive Visualisierung der Binnenmigration &mdash; wohin Menschen umziehen,
+      woher sie kommen, und wie sich die Muster über die Jahre verändert haben.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Erfasste Wanderungen</div>
+        <div class="stat-value" id="counter-total">—</div>
+        <div class="stat-sub">gesamt über alle Jahre</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Beobachtungszeitraum</div>
+        <div class="stat-value" id="counter-years">—</div>
+        <div class="stat-sub" id="counter-years-range"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Gemeinden</div>
+        <div class="stat-value" id="counter-gemeinden">—</div>
+        <div class="stat-sub">österreichische Gemeinden</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="year-bar">
+  <div class="container">
+    <div class="year-bar-inner">
+      <span class="control-label">Jahr</span>
+      <button class="year-step-btn" id="dash-btn-prev" title="Vorheriges Jahr">‹</button>
+      <span class="year-display" id="dash-year-display">—</span>
+      <input type="range" id="dash-year-slider" class="year-range" min="0" max="0" value="0">
+      <button class="year-step-btn" id="dash-btn-next" title="Nächstes Jahr">›</button>
+      <button class="year-play-btn" id="dash-btn-play" title="Animation">▶</button>
+      <button class="chip chip-btn" id="dash-btn-all">Alle Jahre</button>
+      <span class="year-bar-hint">Zeitreihe zeigt immer alle Jahre</span>
+    </div>
+  </div>
+</div>
+
+{% if content_intro %}
+<div class="content" style="padding-bottom:0;">
+  <div class="container">
+    <div class="prose">{{ content_intro | safe }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="content">
+  <div class="container">
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Wanderungen über Zeit</div>
+            <div class="card-subtitle">Entwicklung der Binnenmigration nach Jahr und Geschlecht</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-timeseries" style="min-height:360px;"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if content_timeseries %}
+    <div class="prose">{{ content_timeseries | safe }}</div>
+    {% endif %}
+
+    <div class="section grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Bilanz nach Bundesland</div>
+            <div class="card-subtitle" id="bl-subtitle">Zuzug und Wegzug im Vergleich</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-bundeslaender" style="min-height:340px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Staatsbürgerschaft</div>
+            <div class="card-subtitle" id="staat-subtitle">Verteilung nach Staatsbürgerschaft</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-staatsbuergerschaft" style="min-height:340px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Migrationsströme zwischen Bundesländern</div>
+            <div class="card-subtitle" id="sankey-subtitle">Top-Wanderungsbewegungen von Bundesland zu Bundesland</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-sankey" style="min-height:480px;"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if content_sankey %}
+    <div class="prose">{{ content_sankey | safe }}</div>
+    {% endif %}
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Netto-Migration nach Bundesland über Zeit</div>
+            <div class="card-subtitle">Zuzug minus Wegzug je Bundesland pro Jahr</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-timeseries-bl" style="min-height:360px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let dashYear  = null;
+  let dashYears = [];
+
+  function setSubtitles(year) {
+    const label = year ? `Jahr ${year}` : 'Alle Jahre';
+    document.getElementById('bl-subtitle').textContent     = `Netto-Migration — ${label}`;
+    document.getElementById('staat-subtitle').textContent  = `Verteilung nach Staatsbürgerschaft — ${label}`;
+    document.getElementById('sankey-subtitle').textContent = `Wanderungsströme — ${label}`;
+  }
+
+  function updateDashCharts() {
+    setSubtitles(dashYear);
+    renderBundeslaender('chart-bundeslaender', dashYear);
+    renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
+    renderSankey('chart-sankey', dashYear);
+  }
+
+  async function initDashboard() {
+    dashYears = await fetchJSON('/api/years');
+    initOverview();
+
+    initYearSlider({
+      years:     dashYears,
+      sliderId:  'dash-year-slider',
+      displayId: 'dash-year-display',
+      btnAllId:  'dash-btn-all',
+      btnPrevId: 'dash-btn-prev',
+      btnNextId: 'dash-btn-next',
+      btnPlayId: 'dash-btn-play',
+      onChange:  (year) => {
+        dashYear = year;
+        const marker = year ? [{ type: 'line', x0: year, x1: year, y0: 0, y1: 1, yref: 'paper',
+          line: { color: 'rgba(30,58,95,0.35)', width: 1.5, dash: 'dot' } }] : [];
+        Plotly.relayout('chart-timeseries',    { shapes: marker });
+        Plotly.relayout('chart-timeseries-bl', { shapes: marker });
+        updateDashCharts();
+      },
+    });
+
+    renderTimeseries('chart-timeseries');
+    renderTimeseriesBundeslaender('chart-timeseries-bl');
+    updateDashCharts();
+  }
+
+  initDashboard();
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Karte – Binnenmigration Österreich{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/scrollama@3.2.0/build/scrollama.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="karte-intro container">
+  <h1 class="karte-intro-title">Wo zieht Österreich hin?</h1>
+  <p>
+    Jedes Jahr wechseln hunderttausende Menschen in Österreich ihren Wohnort —
+    von Stadt zu Land, von West nach Ost, oder in die nächste Großstadt.
+    Diese interaktive Karte macht diese Bewegungen sichtbar: auf Bundeslands-
+    und Bezirksebene, für ein einzelnes Jahr oder über den gesamten Zeitraum.
+  </p>
+  <p>
+    Wähle ein Jahr aus, um zu sehen, wie sich die Wanderungsbewegungen verändert haben.
+    Die Daten zeigen die <strong>Netto-Migration</strong> — also die Differenz zwischen
+    Zu- und Wegzug.
+    <span class="highlight-green">Grüne Flächen</span> gewinnen Einwohner:innen,
+    <span class="highlight-red">pinke Flächen</span> verlieren sie.
+  </p>
+  <div class="karte-year-row">
+    <span class="karte-year-label">Jahr:</span>
+    <select id="karte-year-select" class="year-pill-select">
+      <option value="">Alle Jahre</option>
+    </select>
+  </div>
+</div>
+
+<div class="story-row karte-dark">
+
+  <!-- ── Linke Spalte: Inhalt klebt (sticky) ───────────────────── -->
+  <div class="story-left">
+    <div class="story-graphic" id="story-graphic">
+      <!-- Horizontale Legende über der Karte -->
+      <div id="story-legend" class="story-legend-top"></div>
+      <div id="story-map" style="width:100%; height:calc(100% - 72px); margin-top:72px;"></div>
+      <div id="scroll-loading" class="scroll-loading" style="display:none;">
+        <div class="spinner"></div><span>Lade Bezirksdaten …</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Rechte Spalte: scrollt normal ─────────────────────────── -->
+  <div class="story-steps">
+
+    <div class="scroll-step" data-step="map">
+      <div class="step-card">
+        <div class="step-num">01 — Überblick</div>
+        <h2>Wer zieht wohin?</h2>
+        <p>Jährlich wechseln über <strong>200.000 Menschen</strong> in Österreich
+           ihren Wohnort. Die Karte zeigt die Netto-Migration nach Bundesland —
+           <span class="highlight-green">grüne Flächen</span> gewinnen
+           Einwohner:innen, <span class="highlight-red">pinke Flächen</span>
+           verlieren sie.</p>
+      </div>
+    </div>
+
+    <div class="scroll-step" data-step="bezirke">
+      <div class="step-card">
+        <div class="step-num">02 — Bezirke</div>
+        <h2>Österreichs 94 Bezirke</h2>
+        <p>Auf Bezirksebene zeigt sich das Muster deutlicher: Ballungsräume rund um
+           <strong>Wien, Graz und Linz</strong> wachsen, während Bezirke an der
+           Peripherie oft Einwohner:innen verlieren.</p>
+      </div>
+    </div>
+
+    <div class="scroll-step" data-step="chart">
+      <div class="step-card">
+        <div class="step-num">03 — Vergleich</div>
+        <h2>Zu- und Abwanderung nach Bundesland</h2>
+        <p>Jeder Bezirk wird zu einem Punkt. Punkte
+           <span class="highlight-green">rechts der Mitte</span> verzeichnen
+           mehr Zuzug als Wegzug — Punkte
+           <span class="highlight-red">links</span> verlieren Bevölkerung.</p>
+        <div class="chart-legend-box">
+          <div class="chart-legend-item">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <circle cx="7" cy="7" r="5" fill="#94a3b8"/>
+            </svg>
+            <span>ein Bezirk</span>
+          </div>
+          <div class="chart-legend-item">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <rect x="2" y="2" width="10" height="10" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+            </svg>
+            <span>Ø Netto-Migration eines Bundeslandes</span>
+          </div>
+          <div class="chart-legend-item">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <circle cx="7" cy="7" r="5" fill="#94a3b8"/>
+              <circle cx="7" cy="7" r="8" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            </svg>
+            <span>Bezirk mit Landeshauptstadt</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-step" data-step="flows">
+      <div class="step-card">
+        <div class="step-num">04 — Absolute Zahlen</div>
+        <h2>Wieviele Menschen ziehen wirklich?</h2>
+        <p>Hinter jedem Netto-Wert stecken reale Bewegungen:
+           <span class="highlight-red">Wegzug</span> nach links,
+           <span class="highlight-green">Zuzug</span> nach rechts.
+           Bundesländer mit hohem Zuzug <em>und</em> hohem Wegzug
+           sind besonders dynamisch — Menschen kommen und gehen gleichermaßen.</p>
+      </div>
+    </div>
+
+    <div class="scroll-step" data-step="netto">
+      <div class="step-card">
+        <div class="step-num">05 — Netto-Ranking</div>
+        <h2>Die Bilanz: Wer gewinnt, wer verliert?</h2>
+        <p>Zuzug minus Wegzug ergibt die <strong>Netto-Migration</strong> — die echte Bilanz jedes Bundeslandes.
+           <span class="highlight-green">Positive Werte</span> bedeuten Bevölkerungszuwachs,
+           <span class="highlight-red">negative Werte</span> Schrumpfung.
+           Die Bundesländer sind nach diesem Wert gereiht.</p>
+      </div>
+    </div>
+
+  </div><!-- /story-steps -->
+</div><!-- /story-row -->
+
+<div class="karte-intro karte-outro container">
+  <h2 class="karte-intro-title" style="font-size:1.6rem;">Wie sieht es in deiner Gemeinde aus?</h2>
+  <p>
+    Die Karte zeigt das große Bild — aber hinter jedem Bundesland stecken
+    hunderte Gemeinden mit ganz eigenen Geschichten.
+    Wächst deine Heimatgemeinde? Oder verliert sie Einwohner:innen?
+    Im Gemeinde-Explorer kannst du jede der über 2.000 österreichischen Gemeinden
+    einzeln erkunden.
+  </p>
+  <a href="{{ url_for('main.gemeinde') }}" class="cta-button">
+    Gemeinde-Explorer öffnen
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scrollytelling.js') }}"></script>
+<script>
+  (async function () {
+    /* Jahre ins Dropdown laden */
+    const years = await fetchJSON('/api/years');
+    const sel = document.getElementById('karte-year-select');
+    years.forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      if (y === 2022) opt.selected = true;
+      sel.appendChild(opt);
+    });
+
+    /* Startwert setzen */
+    const startYear = sel.value || null;
+
+    initChoroplethMap('story-map', () => {});
+    await renderChoropleth('story-map', 'bundeslaender', 'netto', startYear);
+    await initScrollytelling('story-map');
+    if (startYear) await scrollySetYear(startYear);
+
+    /* Jahreswechsel */
+    sel.addEventListener('change', () => scrollySetYear(sel.value || null));
+  })();
+</script>
+{% endblock %}

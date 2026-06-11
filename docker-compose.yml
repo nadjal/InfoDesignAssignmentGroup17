@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_DEBUG=1
+      - DATABASE=./data/binnenmigration.db
+    restart: unless-stopped

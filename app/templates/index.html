@@ -58,6 +58,7 @@
 <div class="content" style="padding-bottom:0;">
   <div class="container">
     <div class="prose">{{ content_intro | safe }}</div>
+    <p id="year-migration-stat" class="hero-year-stat"></p>
   </div>
 </div>
 {% endif %}
@@ -65,25 +66,18 @@
 <div class="content">
   <div class="container">
 
-    <div class="section">
+    <div class="section grid-2">
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Wanderungen über Zeit</div>
-            <div class="card-subtitle">Entwicklung der Binnenmigration nach Jahr und Geschlecht</div>
+            <div class="card-title">Art der Wanderung</div>
+            <div class="card-subtitle">Wanderungstypen nach räumlicher Reichweite</div>
           </div>
         </div>
         <div class="card-body chart-wrap">
-          <div id="chart-timeseries" style="min-height:360px;"></div>
+          <div id="chart-migration-typen" style="min-height:340px;"></div>
         </div>
       </div>
-    </div>
-
-    {% if content_timeseries %}
-    <div class="prose">{{ content_timeseries | safe }}</div>
-    {% endif %}
-
-    <div class="section grid-2">
       <div class="card">
         <div class="card-header">
           <div>
@@ -93,17 +87,6 @@
         </div>
         <div class="card-body chart-wrap">
           <div id="chart-bundeslaender" style="min-height:340px;"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Staatsbürgerschaft</div>
-            <div class="card-subtitle" id="staat-subtitle">Verteilung nach Staatsbürgerschaft</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-staatsbuergerschaft" style="min-height:340px;"></div>
         </div>
       </div>
     </div>
@@ -142,6 +125,90 @@
 
   </div>
 </div>
+
+<div class="karte-intro container" style="text-align:center; padding: 3rem 1rem;">
+  <h2 class="karte-intro-title" style="font-size:1.4rem;">Möchtest du erfahren, wie die Binnenmigration innerhalb der Bundesländer aussieht?</h2>
+  <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+    Die interaktive Karte zeigt Zuzug, Wegzug und Nettoentwicklung auf Ebene der Bundesländer, Bezirke und Gemeinden.
+  </p>
+  <a href="{{ url_for('main.karte') }}" class="cta-button">
+    Zur Karte
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+  <p id="scroll-hint" style="color:var(--text-muted); margin-top:2rem; font-size:0.95rem;">
+    Oder möchtest du dir die genauer ansehen wie sich verschiedene Aspekte der Binnenmigration im Laufe der Zeit verändert haben? Dann scrolle weiter ↓
+  </p>
+</div>
+
+<div id="extended-content" style="opacity:0; transition: opacity 0.6s ease;">
+<div class="content">
+  <div class="container">
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Jahresvergleich</div>
+            <div class="card-subtitle">Wanderungen pro Jahr im Vergleich zum Jahresdurchschnitt</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-jahresvergleich" style="min-height:320px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Art der Wanderung über Zeit</div>
+            <div class="card-subtitle">Entwicklung der Wanderungstypen nach räumlicher Reichweite</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-migration-typen-zeitreihe" style="min-height:360px;"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if content_timeseries %}
+    <div class="prose">{{ content_timeseries | safe }}</div>
+    {% endif %}
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Geschlecht</div>
+            <div class="card-subtitle">Entwicklung der Binnenmigration nach Jahr und Geschlecht</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-timeseries" style="min-height:360px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Staatsbürgerschaft</div>
+            <div class="card-subtitle">Entwicklung der Binnenmigration nach Staatsbürgerschaft</div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap">
+          <div id="chart-staatsbuergerschaft" style="min-height:340px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div><!-- /extended-content -->
 {% endblock %}
 
 {% block scripts %}
@@ -151,16 +218,32 @@
 
   function setSubtitles(year) {
     const label = year ? `Jahr ${year}` : 'Alle Jahre';
-    document.getElementById('bl-subtitle').textContent     = `Netto-Migration — ${label}`;
-    document.getElementById('staat-subtitle').textContent  = `Verteilung nach Staatsbürgerschaft — ${label}`;
-    document.getElementById('sankey-subtitle').textContent = `Wanderungsströme — ${label}`;
+    const bl    = document.getElementById('bl-subtitle');
+    const sankey = document.getElementById('sankey-subtitle');
+    if (bl)     bl.textContent     = `Netto-Migration — ${label}`;
+    if (sankey) sankey.textContent = `Wanderungsströme — ${label}`;
+  }
+
+  function updateYearMigrationStat(year) {
+    const el = document.getElementById('year-migration-stat');
+    if (!el || !_migrationTypenData) return;
+    const avg = Math.round(_migrationTypenData.reduce((s, d) => s + d.total, 0) / _migrationTypenData.length);
+    if (!year) { el.textContent = ''; return; }
+    const row = _migrationTypenData.find(d => d.jahr === year);
+    if (!row) { el.textContent = ''; return; }
+    const diff = row.total - avg;
+    const pct  = Math.abs(Math.round(diff / avg * 100));
+    const dir  = diff >= 0 ? 'mehr' : 'weniger';
+    el.innerHTML = `Im Jahr <strong>${year}</strong> wanderten <strong>${fmt(row.total)}</strong> Personen innerhalb Österreichs — das ist <strong>${pct} % ${dir}</strong> als der Jahresdurchschnitt von ${fmt(avg)} Personen.`;
   }
 
   function updateDashCharts() {
     setSubtitles(dashYear);
+    updateYearMigrationStat(dashYear);
+    renderMigrationTypen('chart-migration-typen', dashYear);
     renderBundeslaender('chart-bundeslaender', dashYear);
-    renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
     renderSankey('chart-sankey', dashYear);
+    if (extendedRendered) renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
   }
 
   async function initDashboard() {
@@ -179,17 +262,37 @@
         dashYear = year;
         const marker = year ? [{ type: 'line', x0: year, x1: year, y0: 0, y1: 1, yref: 'paper',
           line: { color: 'rgba(30,58,95,0.35)', width: 1.5, dash: 'dot' } }] : [];
-        Plotly.relayout('chart-timeseries',    { shapes: marker });
+        if (extendedRendered) Plotly.relayout('chart-timeseries', { shapes: marker });
         Plotly.relayout('chart-timeseries-bl', { shapes: marker });
         updateDashCharts();
       },
     });
 
-    renderTimeseries('chart-timeseries');
+    renderMigrationTypen('chart-migration-typen');
     renderTimeseriesBundeslaender('chart-timeseries-bl');
     updateDashCharts();
   }
 
   initDashboard();
+
+  let extendedRendered = false;
+  function revealExtended() {
+    if (extendedRendered) return;
+    extendedRendered = true;
+    const el = document.getElementById('extended-content');
+    el.style.opacity = '1';
+    renderTimeseries('chart-timeseries');
+    renderJahresvergleich('chart-jahresvergleich');
+    renderMigrationTypenZeitreihe('chart-migration-typen-zeitreihe');
+    renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
+  }
+
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) {
+      revealExtended();
+      observer.disconnect();
+    }
+  }, { rootMargin: '0px 0px -50% 0px', threshold: 0 });
+  observer.observe(document.getElementById('scroll-hint'));
 </script>
 {% endblock %}

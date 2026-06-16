@@ -153,6 +153,24 @@ def api_staatsbuergerschaft():
     return jsonify(_rows(result))
 
 
+@bp.route('/api/timeseries_staatsbuergerschaft')
+def api_timeseries_staatsbuergerschaft():
+    df = _df()
+    top = (
+        df.groupby('staatsbuergerschaft', dropna=True)['anzahl']
+        .sum().nlargest(8).index.tolist()
+    )
+    df = df[df['staatsbuergerschaft'].isin(top)]
+    result = (
+        df.groupby(['jahr', 'staatsbuergerschaft'], dropna=True)['anzahl']
+        .sum().reset_index()
+        .rename(columns={'anzahl': 'total'})
+        .sort_values(['staatsbuergerschaft', 'jahr'])
+        .astype({'jahr': int, 'total': int})
+    )
+    return jsonify(_rows(result))
+
+
 @bp.route('/api/timeseries_bundeslaender')
 def api_timeseries_bundeslaender():
     df = _df()
@@ -195,6 +213,27 @@ def api_sankey():
         ],
     })
 
+
+
+@bp.route('/api/migration_typen')
+def api_migration_typen():
+    df = _df()
+    result = []
+    for jahr, g in df.groupby('jahr'):
+        zwischen_bl  = int(g[g['von_bundesland'] != g['nach_bundesland']]['anzahl'].sum())
+        innerhalb_bl = int(g[(g['von_bundesland'] == g['nach_bundesland']) & (g['von_gkz'] != g['nach_gkz'])]['anzahl'].sum())
+        innerhalb_gm = int(g[g['von_gkz'] == g['nach_gkz']]['anzahl'].sum())
+        total = zwischen_bl + innerhalb_bl + innerhalb_gm
+        if total == 0:
+            continue
+        result.append({
+            'jahr': int(jahr),
+            'zwischen_bundeslaender': zwischen_bl,
+            'innerhalb_bundesland':   innerhalb_bl,
+            'innerhalb_gemeinde':     innerhalb_gm,
+            'total': total,
+        })
+    return jsonify(sorted(result, key=lambda r: r['jahr']))
 
 
 @bp.route('/api/choropleth')

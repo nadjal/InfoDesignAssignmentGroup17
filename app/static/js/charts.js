@@ -23,13 +23,13 @@ const BASE = {
   colorway: SEQ,
   xaxis: {
     gridcolor: '#E2E8F0', linecolor: '#E2E8F0', zerolinecolor: '#CBD5E1',
-    tickfont: { size: 11, color: '#64748B' },
+    tickfont: { size: 11, color: 'white' },
   },
   yaxis: {
     gridcolor: '#E2E8F0', linecolor: 'transparent', zerolinecolor: '#CBD5E1',
-    tickfont: { size: 11, color: '#64748B' },
+    tickfont: { size: 11, color: 'white' },
   },
-  legend: { bgcolor: 'transparent', font: { size: 11 } },
+  legend: { bgcolor: 'transparent', font: { size: 11, color: 'white' } },
   hoverlabel: {
     bgcolor: 'white',
     bordercolor: '#E2E8F0',
@@ -163,6 +163,61 @@ async function initOverview() {
   }
 }
 
+/* ── Migrationstypen (Pie) ────────────────────────────────────────── */
+const MIGRATION_TYPEN = [
+  { key: 'innerhalb_bundesland',   label: 'Innerhalb Bundesland',   color: '#34D399' },
+  { key: 'innerhalb_gemeinde',     label: 'Innerhalb Gemeinde',     color: '#FACC15' },
+  { key: 'zwischen_bundeslaender', label: 'Zwischen Bundesländern', color: '#60A5FA' },
+];
+let _migrationTypenData = null;
+
+function _migrationTypenRow(year) {
+  if (!_migrationTypenData) return null;
+  return year
+    ? _migrationTypenData.find(d => d.jahr === year)
+    : _migrationTypenData.reduce((acc, d) => ({
+        zwischen_bundeslaender: (acc.zwischen_bundeslaender || 0) + d.zwischen_bundeslaender,
+        innerhalb_bundesland:   (acc.innerhalb_bundesland   || 0) + d.innerhalb_bundesland,
+        innerhalb_gemeinde:     (acc.innerhalb_gemeinde     || 0) + d.innerhalb_gemeinde,
+      }), {});
+}
+
+async function renderMigrationTypen(id, year = null) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  try {
+    if (!_migrationTypenData) {
+      _migrationTypenData = await fetchJSON('/api/migration_typen');
+    }
+    const row = _migrationTypenRow(year);
+    if (!row) { errState(el, 'Keine Daten für dieses Jahr.'); return; }
+
+    const values = MIGRATION_TYPEN.map(t => row[t.key] || 0);
+
+    if (el._fullLayout) {
+      Plotly.restyle(el, { values: [values] }, [0]);
+    } else {
+      el.innerHTML = '';
+      Plotly.newPlot(el, [{
+        labels: MIGRATION_TYPEN.map(t => t.label),
+        values,
+        type: 'pie', hole: 0.55, direction: 'clockwise', sort: false, rotation: 0,
+        textinfo: 'label+percent',
+        textposition: 'outside',
+        textfont: { size: 11, color: 'white' },
+        automargin: true,
+        hovertemplate: '<b>%{label}</b><br>%{value:,.0f} Personen<br>%{percent}<extra></extra>',
+        marker: { colors: MIGRATION_TYPEN.map(t => t.color), line: { color: '#1a2535', width: 2 } },
+      }], {
+        paper_bgcolor: 'transparent',
+        font: { ...BASE.font, color: 'white' },
+        showlegend: false,
+        margin: { t: 40, r: 80, b: 40, l: 80 },
+      }, CFG);
+    }
+  } catch (e) { errState(el); }
+}
+
 /* ── Zeitreihe ────────────────────────────────────────────────────── */
 async function renderTimeseries(id, highlightYear = null) {
   const el = document.getElementById(id);
@@ -186,15 +241,23 @@ async function renderTimeseries(id, highlightYear = null) {
       name: 'Gesamt', showlegend: false, hoverinfo: 'skip',
     });
 
+    const DARK_LINE_COLORS = ['#FB923C', '#60A5FA'];
     groups.forEach((g, i) => {
+      const color = DARK_LINE_COLORS[i];
       traces.push({
         x: years,
         y: years.map(y => { const r = data.find(d => d.jahr === y && d.geschlecht === g); return r ? r.total : 0; }),
-        name: g,
+        name: g, showlegend: false, legendgroup: g,
         type: 'scatter', mode: 'lines+markers',
-        line: { width: 2.5, shape: 'spline', smoothing: 0.4, color: SEQ[i] },
-        marker: { size: 5, color: SEQ[i] },
+        line: { width: 2.5, shape: 'spline', smoothing: 0.4, color },
+        marker: { size: 5, color },
         hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+      });
+      traces.push({
+        x: [null], y: [null], name: g, showlegend: true, legendgroup: g,
+        type: 'scatter', mode: 'markers',
+        marker: { symbol: 'square', size: 10, color },
+        hoverinfo: 'skip',
       });
     });
 
@@ -202,19 +265,23 @@ async function renderTimeseries(id, highlightYear = null) {
       x: years, y: totals,
       name: 'Gesamt',
       type: 'scatter', mode: 'lines',
-      line: { width: 2, dash: 'dot', color: '#CBD5E1' },
+      line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
       hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
     });
 
     const shapes = highlightYear ? [{
       type: 'line',
       x0: highlightYear, x1: highlightYear, y0: 0, y1: 1, yref: 'paper',
-      line: { color: 'rgba(30,58,95,0.35)', width: 1.5, dash: 'dot' },
+      line: { color: 'rgba(255,255,255,0.35)', width: 1.5, dash: 'dot' },
     }] : [];
 
     Plotly.newPlot(el, traces, lay({
+      plot_bgcolor: '#1a2535',
       hovermode: 'x unified',
-      yaxis: { tickformat: ',.0f' },
+      xaxis: { gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      yaxis: { tickformat: ',.0f', gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      legend: { orientation: 'v', x: 1.01, xanchor: 'left', font: { size: 11, color: 'white' } },
+      margin: { t: 24, r: 160, b: 52, l: 64 },
       shapes,
     }), CFG);
   } catch (e) { errState(el); }
@@ -239,51 +306,85 @@ async function renderBundeslaender(id, year = null) {
       hovertemplate: '<b>%{y}</b><br>Netto: <b>%{x:+,.0f}</b><br>Zuzug: %{customdata[0]:,.0f}<br>Wegzug: %{customdata[1]:,.0f}<extra></extra>',
       customdata: sorted.map(d => [d.zuzug, d.ausziehend]),
     }], lay({
+      plot_bgcolor: '#1a2535',
       margin: { t: 16, r: 32, b: 48, l: 145 },
       xaxis: {
         tickformat: '+,.0f',
-        title: { text: 'Netto-Migration (Zuzug − Wegzug)', font: { size: 11, color: '#64748B' } },
-        zerolinecolor: '#94A3B8',
+        title: { text: 'Netto-Migration (Zuzug − Wegzug)', font: { size: 11, color: 'white' } },
+        gridcolor: 'rgba(255,255,255,0.08)',
+        zerolinecolor: 'rgba(255,255,255,0.3)',
         zerolinewidth: 2,
       },
-      yaxis: { automargin: true },
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.08)', linecolor: 'rgba(255,255,255,0.08)', tickcolor: 'rgba(255,255,255,0.08)' },
       showlegend: false,
     }), CFG);
   } catch (e) { errState(el); }
 }
 
-/* ── Staatsbürgerschaft-Donut ─────────────────────────────────────── */
-async function renderStaatsbuergerschaft(id, year = null) {
+/* ── Staatsbürgerschaft-Zeitreihe ────────────────────────────────── */
+const STAAT_COLORS = ['#FB923C', '#60A5FA', '#F59E0B', '#3B82F6', '#FDBA74', '#93C5FD', '#EA580C', '#1D4ED8'];
+
+async function renderStaatsbuergerschaft(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = '';
   try {
-    const url = year ? `/api/staatsbuergerschaft?year=${year}` : '/api/staatsbuergerschaft';
-    const data = await fetchJSON(url);
-    const top  = data.slice(0, 8);
-    const rest = data.slice(8);
+    const data    = await fetchJSON('/api/timeseries_staatsbuergerschaft');
+    const years   = [...new Set(data.map(d => d.jahr))].sort();
+    const staaten = [...new Set(data.map(d => d.staatsbuergerschaft))];
+    const STAAT_LABELS = {
+      'Inländer':  'österr.<br>Staatsbürgerschaft',
+      'Ausländer': 'keine österr.<br>Staatsbürgerschaft',
+    };
 
-    const labels = top.map(d => d.staatsbuergerschaft);
-    const values = top.map(d => d.total);
-    if (rest.length) {
-      labels.push('Sonstige');
-      values.push(rest.reduce((s, d) => s + d.total, 0));
-    }
+    const totals = years.map(y =>
+      data.filter(d => d.jahr === y).reduce((s, d) => s + (d.total || 0), 0)
+    );
 
-    Plotly.newPlot(el, [{
-      labels, values,
-      type: 'pie', hole: 0.58,
-      textinfo: 'percent',
-      textfont: { size: 11 },
-      hovertemplate: '<b>%{label}</b><br>%{value:,.0f} Personen<br>%{percent}<extra></extra>',
-      marker: {
-        colors: SEQ,
-        line: { color: 'white', width: 2.5 },
-      },
-    }], lay({
-      margin: { t: 16, r: 16, b: 16, l: 16 },
-      showlegend: true,
-      legend: { orientation: 'v', x: 1.02, xanchor: 'left', font: { size: 10.5 } },
+    const traces = [];
+
+    traces.push({
+      x: years, y: totals,
+      type: 'scatter', mode: 'none',
+      fill: 'tozeroy', fillcolor: 'rgba(14,165,233,0.06)',
+      name: 'Gesamt', showlegend: false, hoverinfo: 'skip',
+    });
+
+    staaten.forEach((s, i) => {
+      const color = STAAT_COLORS[i % STAAT_COLORS.length];
+      const label = STAAT_LABELS[s] || s;
+      traces.push({
+        x: years,
+        y: years.map(y => { const r = data.find(d => d.jahr === y && d.staatsbuergerschaft === s); return r ? r.total : 0; }),
+        name: label, showlegend: false, legendgroup: s,
+        type: 'scatter', mode: 'lines+markers',
+        line:   { width: 2.5, shape: 'spline', smoothing: 0.4, color },
+        marker: { size: 5, color },
+        hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+      });
+      traces.push({
+        x: [null], y: [null], name: label, showlegend: true, legendgroup: s,
+        type: 'scatter', mode: 'markers',
+        marker: { symbol: 'square', size: 10, color },
+        hoverinfo: 'skip',
+      });
+    });
+
+    traces.push({
+      x: years, y: totals,
+      name: 'Gesamt',
+      type: 'scatter', mode: 'lines',
+      line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
+      hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
+    });
+
+    Plotly.newPlot(el, traces, lay({
+      plot_bgcolor: '#1a2535',
+      hovermode: 'x unified',
+      xaxis: { gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      yaxis: { tickformat: ',.0f', gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      legend: { orientation: 'v', x: 1.01, xanchor: 'left', font: { size: 11, color: 'white' } },
+      margin: { t: 24, r: 200, b: 52, l: 64 },
     }), CFG);
   } catch (e) { errState(el); }
 }
@@ -298,12 +399,10 @@ async function renderSankey(id, year = null) {
     const d = await fetchJSON(url);
     if (!d.bundeslaender || !d.flows.length) { errState(el, 'Keine Flussdaten verfügbar.'); return; }
 
-    const bls = d.bundeslaender;
+    const bls = [...d.bundeslaender].sort();
     const n   = bls.length;
 
-    const HEX = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd',
-                 '#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
-    const colorOf = Object.fromEntries(bls.map((bl, i) => [bl, HEX[i % HEX.length]]));
+    const colorOf = Object.fromEntries(bls.map((bl, i) => [bl, BL_COLORS[i % BL_COLORS.length]]));
 
     function rgba(hex, a) {
       const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
@@ -335,16 +434,127 @@ async function renderSankey(id, year = null) {
       },
     }], {
       paper_bgcolor: 'transparent',
-      font: { ...BASE.font, size: 13 },
+      font: { ...BASE.font, size: 13, color: 'white' },
       margin: { t: 8, r: 50, b: 8, l: 50 },
     }, CFG);
   } catch (e) { errState(el); }
 }
 
+/* ── Jahresvergleich mit Durchschnitt ────────────────────────────── */
+async function renderJahresvergleich(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    if (!_migrationTypenData) {
+      _migrationTypenData = await fetchJSON('/api/migration_typen');
+    }
+    const years  = _migrationTypenData.map(d => d.jahr);
+    const totals = _migrationTypenData.map(d => d.total);
+    const avg    = Math.round(totals.reduce((s, v) => s + v, 0) / totals.length);
+
+    Plotly.newPlot(el, [
+      {
+        x: years, y: totals,
+        type: 'scatter', mode: 'none',
+        fill: 'tozeroy', fillcolor: 'rgba(96,165,250,0.15)',
+        name: 'Wanderungen', showlegend: false, hoverinfo: 'skip',
+      },
+      {
+        x: years, y: totals,
+        type: 'scatter', mode: 'lines+markers',
+        line: { width: 2.5, shape: 'spline', smoothing: 0.4, color: '#60A5FA' },
+        marker: { size: 5, color: '#60A5FA' },
+        name: 'Wanderungen', showlegend: false,
+        hovertemplate: '<b>%{x}</b><br>%{y:,.0f} Wanderungen<extra></extra>',
+      },
+      {
+        x: [years[0], years[years.length - 1]],
+        y: [avg, avg],
+        type: 'scatter', mode: 'lines',
+        line: { color: 'rgba(255,255,255,0.5)', width: 2, dash: 'dot' },
+        name: `Ø ${fmt(avg)} / Jahr`,
+        hovertemplate: `Durchschnitt: <b>${fmt(avg)}</b><extra></extra>`,
+      },
+    ], lay({
+      plot_bgcolor: '#1a2535',
+      hovermode: 'x unified',
+      xaxis: { gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      yaxis: { tickformat: ',.0f', gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      legend: { x: 1.01, xanchor: 'left', font: { size: 11, color: 'white' } },
+    }), CFG);
+  } catch (e) { errState(el); }
+}
+
+/* ── Migrationstypen Zeitreihe ───────────────────────────────────── */
+async function renderMigrationTypenZeitreihe(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    if (!_migrationTypenData) {
+      _migrationTypenData = await fetchJSON('/api/migration_typen');
+    }
+    const years  = _migrationTypenData.map(d => d.jahr);
+    const totals = years.map((_, i) => _migrationTypenData[i].total);
+    const traces = [];
+
+    traces.push({
+      x: years, y: totals,
+      type: 'scatter', mode: 'none',
+      fill: 'tozeroy', fillcolor: 'rgba(14,165,233,0.06)',
+      showlegend: false, hoverinfo: 'skip',
+    });
+
+    MIGRATION_TYPEN.forEach(t => {
+      const color = t.color;
+      traces.push({
+        x: years,
+        y: _migrationTypenData.map(d => d[t.key] || 0),
+        name: t.label, showlegend: false, legendgroup: t.key,
+        type: 'scatter', mode: 'lines+markers',
+        line:   { width: 2.5, shape: 'spline', smoothing: 0.4, color },
+        marker: { size: 5, color },
+        hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+      });
+      traces.push({
+        x: [null], y: [null], name: t.label, showlegend: true, legendgroup: t.key,
+        type: 'scatter', mode: 'markers',
+        marker: { symbol: 'square', size: 10, color },
+        hoverinfo: 'skip',
+      });
+    });
+
+    traces.push({
+      x: years, y: totals,
+      name: 'Gesamt',
+      type: 'scatter', mode: 'lines',
+      line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
+      hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
+    });
+
+    Plotly.newPlot(el, traces, lay({
+      plot_bgcolor: '#1a2535',
+      hovermode: 'x unified',
+      xaxis: { gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      yaxis: { tickformat: ',.0f', gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      legend: { orientation: 'v', x: 1.01, xanchor: 'left', font: { size: 11, color: 'white' } },
+      margin: { t: 24, r: 160, b: 52, l: 64 },
+    }), CFG);
+  } catch (e) { errState(el); }
+}
+
 /* ── Zeitreihe nach Bundesland ────────────────────────────────────── */
 const BL_COLORS = [
-  '#1E3A5F', '#0EA5E9', '#F59E0B', '#10B981',
-  '#6366F1', '#EC4899', '#14B8A6', '#F97316', '#8B5CF6',
+  '#60A5FA', // Burgenland  — blau
+  '#FB923C', // Kärnten     — orange
+  '#4ADE80', // Niederösterreich — grün
+  '#F87171', // Oberösterreich   — rot
+  '#C084FC', // Salzburg    — lila
+  '#A16207', // Steiermark  — braun
+  '#F472B6', // Tirol       — rosa
+  '#94A3B8', // Vorarlberg  — grau
+  '#FACC15', // Wien        — gelb
 ];
 
 async function renderTimeseriesBundeslaender(id) {
@@ -367,9 +577,11 @@ async function renderTimeseriesBundeslaender(id) {
     }));
 
     Plotly.newPlot(el, traces, lay({
+      plot_bgcolor: '#1a2535',
       hovermode: 'x unified',
-      yaxis: { tickformat: '+,.0f', zerolinecolor: '#94A3B8', zerolinewidth: 2 },
-      legend: { orientation: 'v', x: 1.01, xanchor: 'left', font: { size: 11 } },
+      xaxis: { gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.15)' },
+      yaxis: { tickformat: '+,.0f', gridcolor: 'rgba(255,255,255,0.08)', zerolinecolor: 'rgba(255,255,255,0.3)', zerolinewidth: 2 },
+      legend: { orientation: 'v', x: 1.01, xanchor: 'left', font: { size: 11, color: 'white' } },
       margin: { t: 24, r: 160, b: 52, l: 64 },
     }), CFG);
   } catch (e) { errState(el); }

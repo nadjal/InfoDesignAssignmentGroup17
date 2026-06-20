@@ -8,9 +8,10 @@ MIG_URL = 'https://data.statistik.gv.at/data/OGDEXT_BINNENWAND_1.zip'
 GEM_URL = 'https://www.statistik.at/fileadmin/pages/453/RegGemVz2024.ods'
 
 
-MIG_CACHE = DATA_DIR / 'OGDEXT_BINNENWAND_1.zip'
-GEM_CACHE = DATA_DIR / 'RegGemVz2024.ods'
-PKL_CACHE = DATA_DIR / 'dataframes.pkl'
+MIG_CACHE   = DATA_DIR / 'OGDEXT_BINNENWAND_1.zip'
+GEM_CACHE   = DATA_DIR / 'RegGemVz2024.ods'
+PKL_CACHE   = DATA_DIR / 'dataframes.pkl'
+ALTER_CACHE = DATA_DIR / 'altersdaten.csv'
 
 # ── Label mappings ────────────────────────────────────────────────────
 # Edit these dicts to change how coded values appear everywhere in the app.
@@ -72,6 +73,27 @@ def _load_gemeinden():
     return df
 
 
+def _load_altersdaten():
+    # STATcube export: 8 header rows, semicolon-separated, year only in first row of group
+    df = pd.read_csv(
+        ALTER_CACHE,
+        sep=';',
+        skiprows=9,
+        header=None,
+        usecols=[0, 1, 2, 4, 6],
+        names=['jahr', 'altersgruppe', 'ueber_gemeindegrenzen', 'innerhalb_gemeinde', 'zwischen_bundeslaendern'],
+        encoding='latin-1',
+    )
+    df = df[df['altersgruppe'].notna() & (df['altersgruppe'].str.strip() != '')]
+    df['jahr'] = df['jahr'].replace('', pd.NA).ffill()
+    df['jahr'] = pd.to_numeric(df['jahr'], errors='coerce')
+    for col in ['ueber_gemeindegrenzen', 'innerhalb_gemeinde', 'zwischen_bundeslaendern']:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    df = df.dropna(subset=['jahr']).reset_index(drop=True)
+    df['jahr'] = df['jahr'].astype(int)
+    return df
+
+
 def load_data():
     if PKL_CACHE.exists():
         print('Loading DataFrames from pickle cache ...', flush=True)
@@ -111,7 +133,8 @@ def load_data():
         if col in df.columns:
             df[col] = df[col].astype(str).map(mapping).fillna(df[col].astype(str))
 
-    result = (df, df_gem)
+    df_alter = _load_altersdaten()
+    result = (df, df_gem, df_alter)
     pd.to_pickle(result, PKL_CACHE)
     print(f'Ready: {len(df):,} rows, {df["jahr"].nunique()} years', flush=True)
     return result

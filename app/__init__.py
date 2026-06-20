@@ -13,7 +13,7 @@ def create_app():
     app = Flask(__name__)
 
     from .data_loader import load_data
-    app.config['DF'], app.config['DF_GEM'] = load_data()
+    app.config['DF'], app.config['DF_GEM'], app.config['DF_ALTER'] = load_data()
 
     geojson_dir = Path(__file__).parent / 'static' / 'geojson'
     names = {}

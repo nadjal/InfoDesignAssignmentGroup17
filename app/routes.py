@@ -36,6 +36,9 @@ def _df():
 def _df_gem():
     return current_app.config['DF_GEM']
 
+def _df_alter():
+    return current_app.config['DF_ALTER']
+
 def _md(filename):
     path = CONTENT_DIR / filename
     if not path.exists():
@@ -234,6 +237,32 @@ def api_migration_typen():
             'total': total,
         })
     return jsonify(sorted(result, key=lambda r: r['jahr']))
+
+
+@bp.route('/api/altersgruppen')
+def api_altersgruppen():
+    year = request.args.get('year', type=int)
+    df = _df_alter()
+    if year:
+        df = df[df['jahr'] == year]
+    if df.empty:
+        return jsonify([])
+    grouped = df.groupby('altersgruppe')[['ueber_gemeindegrenzen', 'innerhalb_gemeinde', 'zwischen_bundeslaendern']].sum().reset_index()
+    ORDER = ['bis 14 Jahre', '15 bis 29 Jahre', '30 bis 44 Jahre', '45 bis 59 Jahre', '60 bis 74 Jahre', '75 Jahre und älter']
+    grouped['_sort'] = grouped['altersgruppe'].map(lambda x: ORDER.index(x) if x in ORDER else 99)
+    grouped = grouped.sort_values('_sort').drop(columns='_sort')
+    result = []
+    for _, row in grouped.iterrows():
+        ueber  = int(row['ueber_gemeindegrenzen'] or 0)
+        inn_gm = int(row['innerhalb_gemeinde'] or 0)
+        zw_bl  = int(row['zwischen_bundeslaendern'] or 0)
+        result.append({
+            'altersgruppe':        row['altersgruppe'],
+            'zwischen_bundeslaender': zw_bl,
+            'innerhalb_bundesland':   max(ueber - zw_bl, 0),
+            'innerhalb_gemeinde':     inn_gm,
+        })
+    return jsonify(result)
 
 
 @bp.route('/api/choropleth')

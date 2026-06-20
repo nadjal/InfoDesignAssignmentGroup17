@@ -287,36 +287,40 @@ async function renderTimeseries(id, highlightYear = null) {
   } catch (e) { errState(el); }
 }
 
-/* ── Bundesländer-Netto ───────────────────────────────────────────── */
-async function renderBundeslaender(id, year = null) {
+/* ── Altersgruppen-Wanderungstypen (stacked bar) ──────────────────── */
+async function renderAltersgruppen(id, year = null) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = '';
   try {
-    const url = year ? `/api/bundeslaender?year=${year}` : '/api/bundeslaender';
+    const url = year ? `/api/altersgruppen?year=${year}` : '/api/altersgruppen';
     const data = await fetchJSON(url);
-    const sorted = [...data].sort((a, b) => a.netto - b.netto);
+    if (!data.length) { errState(el, 'Keine Daten für dieses Jahr.'); return; }
 
-    Plotly.newPlot(el, [{
-      y: sorted.map(d => d.bundesland),
-      x: sorted.map(d => d.netto),
-      type: 'bar',
+    const groups = data.map(d => d.altersgruppe);
+    const traces = MIGRATION_TYPEN.map(t => ({
+      name:        t.label,
+      y:           groups,
+      x:           data.map(d => d[t.key] || 0),
+      type:        'bar',
       orientation: 'h',
-      marker: { color: sorted.map(d => d.netto >= 0 ? C.success : C.danger) },
-      hovertemplate: '<b>%{y}</b><br>Netto: <b>%{x:+,.0f}</b><br>Zuzug: %{customdata[0]:,.0f}<br>Wegzug: %{customdata[1]:,.0f}<extra></extra>',
-      customdata: sorted.map(d => [d.zuzug, d.ausziehend]),
-    }], lay({
+      marker:      { color: t.color },
+      hovertemplate: `<b>%{y}</b><br>${t.label}: <b>%{x:,.0f}</b><extra></extra>`,
+    }));
+
+    Plotly.newPlot(el, traces, lay({
+      barmode:      'stack',
       plot_bgcolor: '#1a2535',
-      margin: { t: 16, r: 32, b: 48, l: 145 },
+      margin:       { t: 16, r: 16, b: 48, l: 130 },
       xaxis: {
-        tickformat: '+,.0f',
-        title: { text: 'Netto-Migration (Zuzug − Wegzug)', font: { size: 11, color: 'white' } },
+        tickformat: ',.0f',
+        title: { text: 'Wanderungen', font: { size: 11, color: 'white' } },
         gridcolor: 'rgba(255,255,255,0.08)',
-        zerolinecolor: 'rgba(255,255,255,0.3)',
-        zerolinewidth: 2,
+        zerolinecolor: 'rgba(255,255,255,0.15)',
       },
-      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.08)', linecolor: 'rgba(255,255,255,0.08)', tickcolor: 'rgba(255,255,255,0.08)' },
-      showlegend: false,
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.08)', linecolor: 'rgba(255,255,255,0.08)' },
+      legend: { orientation: 'h', x: 0, y: -0.18, font: { size: 10, color: 'white' } },
+      showlegend: true,
     }), CFG);
   } catch (e) { errState(el); }
 }

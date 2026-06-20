@@ -81,8 +81,8 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Bilanz nach Bundesland</div>
-            <div class="card-subtitle" id="bl-subtitle">Zuzug und Wegzug im Vergleich</div>
+            <div class="card-title">Wanderungen nach Altersgruppe</div>
+            <div class="card-subtitle" id="bl-subtitle">Art der Wanderung nach Altersgruppe</div>
           </div>
         </div>
         <div class="card-body chart-wrap">
@@ -241,7 +241,7 @@
     setSubtitles(dashYear);
     updateYearMigrationStat(dashYear);
     renderMigrationTypen('chart-migration-typen', dashYear);
-    renderBundeslaender('chart-bundeslaender', dashYear);
+    renderAltersgruppen('chart-bundeslaender', dashYear);
     renderSankey('chart-sankey', dashYear);
     if (extendedRendered) renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
   }

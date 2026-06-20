@@ -1,0 +1,155 @@
+STATcube
+
+"Wanderungen innerhalb Österreichs ab 2002 (Q)"
+"Jahr und Alter in 15-Jahresgruppen <6> nach Wanderungen innerhalb Österreichs und Binnenwanderung nach Pol. Bezirken (Ebene +1)"
+"Zählt: Wanderungen innerhalb Österreichs"
+
+;"Werte";"Wanderungen innerhalb Österreichs";;;;;;
+;"Binnenwanderung nach Pol. Bezirken (Ebene +1)";"Wanderungen über Gemeindegrenzen hinweg";"Wanderungen über Gemeindegrenzen hinweg - Anmerkungen";"Wanderungen innerhalb derselben Gemeinde";"Wanderungen innerhalb derselben Gemeinde - Anmerkungen";"Wanderungen zwischen Bundesländern";"Wanderungen zwischen Bundesländern - Anmerkungen";
+"Jahr";"Alter in 15-Jahresgruppen <6>";
+"2024";"bis 14 Jahre";50514;;67048;;17231;;
+;"15 bis 29 Jahre";128855;;147939;;48628;;
+;"30 bis 44 Jahre";96001;;123403;;34458;;
+;"45 bis 59 Jahre";43520;;50183;;14370;;
+;"60 bis 74 Jahre";20723;;22585;;6952;;
+;"75 Jahre und älter";16832;;17106;;2563;;
+"2002";"bis 14 Jahre";47194;;75057;;11618;;
+;"15 bis 29 Jahre";107049;;127729;;33611;;
+;"30 bis 44 Jahre";75380;;110744;;24044;;
+;"45 bis 59 Jahre";22505;;38280;;7538;;
+;"60 bis 74 Jahre";8154;;15060;;2917;;
+;"75 Jahre und älter";9002;;12999;;1815;;
+"2003";"bis 14 Jahre";47179;;68359;;11608;;
+;"15 bis 29 Jahre";109678;;125340;;34526;;
+;"30 bis 44 Jahre";75183;;102971;;23219;;
+;"45 bis 59 Jahre";22984;;34825;;7409;;
+;"60 bis 74 Jahre";7927;;12195;;2817;;
+;"75 Jahre und älter";8724;;11713;;1649;;
+"2004";"bis 14 Jahre";49531;;68562;;12478;;
+;"15 bis 29 Jahre";114595;;130037;;36543;;
+;"30 bis 44 Jahre";79046;;105517;;24708;;
+;"45 bis 59 Jahre";24741;;36204;;7818;;
+;"60 bis 74 Jahre";8798;;12291;;3079;;
+;"75 Jahre und älter";9247;;11842;;1725;;
+"2005";"bis 14 Jahre";50412;;69289;;12854;;
+;"15 bis 29 Jahre";117039;;134077;;37589;;
+;"30 bis 44 Jahre";79964;;106772;;25239;;
+;"45 bis 59 Jahre";26098;;37813;;8187;;
+;"60 bis 74 Jahre";9056;;12639;;3219;;
+;"75 Jahre und älter";9450;;12007;;1752;;
+"2006";"bis 14 Jahre";51301;;70142;;12954;;
+;"15 bis 29 Jahre";118777;;134337;;37950;;
+;"30 bis 44 Jahre";80195;;106568;;25003;;
+;"45 bis 59 Jahre";27684;;39821;;8620;;
+;"60 bis 74 Jahre";9487;;13266;;3376;;
+;"75 Jahre und älter";9147;;11400;;1774;;
+"2007";"bis 14 Jahre";51705;;71128;;13512;;
+;"15 bis 29 Jahre";123250;;138038;;40691;;
+;"30 bis 44 Jahre";81309;;106957;;26036;;
+;"45 bis 59 Jahre";29202;;42052;;9024;;
+;"60 bis 74 Jahre";9991;;14249;;3519;;
+;"75 Jahre und älter";9431;;11855;;1775;;
+"2008";"bis 14 Jahre";51646;;68420;;13585;;
+;"15 bis 29 Jahre";127091;;138639;;41396;;
+;"30 bis 44 Jahre";81611;;103089;;25860;;
+;"45 bis 59 Jahre";31053;;42143;;9592;;
+;"60 bis 74 Jahre";10844;;14504;;3730;;
+;"75 Jahre und älter";10789;;12869;;2053;;
+"2009";"bis 14 Jahre";49406;;65708;;13217;;
+;"15 bis 29 Jahre";128523;;139066;;42935;;
+;"30 bis 44 Jahre";79284;;99734;;25299;;
+;"45 bis 59 Jahre";31936;;42266;;9649;;
+;"60 bis 74 Jahre";11090;;14690;;3875;;
+;"75 Jahre und älter";10990;;12422;;1869;;
+"2010";"bis 14 Jahre";46528;;63798;;12353;;
+;"15 bis 29 Jahre";129712;;138412;;43095;;
+;"30 bis 44 Jahre";77980;;98684;;25303;;
+;"45 bis 59 Jahre";33085;;43024;;10201;;
+;"60 bis 74 Jahre";11639;;15295;;4083;;
+;"75 Jahre und älter";10773;;12608;;1905;;
+"2011";"bis 14 Jahre";48365;;64855;;12767;;
+;"15 bis 29 Jahre";133513;;140885;;44561;;
+;"30 bis 44 Jahre";81255;;101285;;26074;;
+;"45 bis 59 Jahre";35385;;44311;;10762;;
+;"60 bis 74 Jahre";12097;;15745;;4148;;
+;"75 Jahre und älter";10901;;12645;;1802;;
+"2012";"bis 14 Jahre";48021;;64298;;12534;;
+;"15 bis 29 Jahre";136304;;144173;;46924;;
+;"30 bis 44 Jahre";82420;;102761;;26679;;
+;"45 bis 59 Jahre";36384;;46243;;11124;;
+;"60 bis 74 Jahre";12818;;16625;;4400;;
+;"75 Jahre und älter";11391;;13259;;1837;;
+"2013";"bis 14 Jahre";47617;;63425;;12858;;
+;"15 bis 29 Jahre";136378;;145105;;46134;;
+;"30 bis 44 Jahre";83357;;103273;;27058;;
+;"45 bis 59 Jahre";37970;;45359;;11429;;
+;"60 bis 74 Jahre";12746;;16766;;4374;;
+;"75 Jahre und älter";11338;;13102;;1886;;
+"2014";"bis 14 Jahre";49286;;65263;;13590;;
+;"15 bis 29 Jahre";140305;;148883;;47877;;
+;"30 bis 44 Jahre";87574;;106589;;28825;;
+;"45 bis 59 Jahre";39630;;47491;;12050;;
+;"60 bis 74 Jahre";13286;;17004;;4348;;
+;"75 Jahre und älter";11199;;13408;;1875;;
+"2015";"bis 14 Jahre";54316;;68877;;15617;;
+;"15 bis 29 Jahre";155398;;158744;;56216;;
+;"30 bis 44 Jahre";93886;;113868;;31737;;
+;"45 bis 59 Jahre";41808;;49872;;12866;;
+;"60 bis 74 Jahre";14182;;17541;;4851;;
+;"75 Jahre und älter";12214;;14322;;2121;;
+"2016";"bis 14 Jahre";58677;;70899;;18482;;
+;"15 bis 29 Jahre";161360;;163669;;60132;;
+;"30 bis 44 Jahre";95870;;115600;;33492;;
+;"45 bis 59 Jahre";42309;;50064;;13407;;
+;"60 bis 74 Jahre";14068;;17936;;4798;;
+;"75 Jahre und älter";12251;;14436;;1981;;
+"2017";"bis 14 Jahre";55740;;72456;;16065;;
+;"15 bis 29 Jahre";147057;;163411;;50561;;
+;"30 bis 44 Jahre";92801;;116533;;31209;;
+;"45 bis 59 Jahre";41959;;50712;;13059;;
+;"60 bis 74 Jahre";14576;;18425;;4920;;
+;"75 Jahre und älter";13369;;14585;;2240;;
+"2018";"bis 14 Jahre";53335;;73144;;14936;;
+;"15 bis 29 Jahre";140942;;161810;;46392;;
+;"30 bis 44 Jahre";92024;;118460;;30279;;
+;"45 bis 59 Jahre";42410;;51677;;12890;;
+;"60 bis 74 Jahre";15203;;18933;;4952;;
+;"75 Jahre und älter";14556;;15172;;2198;;
+"2019";"bis 14 Jahre";51902;;73462;;14743;;
+;"15 bis 29 Jahre";136822;;157560;;45514;;
+;"30 bis 44 Jahre";93598;;121876;;30892;;
+;"45 bis 59 Jahre";43607;;52873;;13499;;
+;"60 bis 74 Jahre";16313;;20294;;5352;;
+;"75 Jahre und älter";14314;;15799;;2222;;
+"2020";"bis 14 Jahre";51129;;69868;;15461;;
+;"15 bis 29 Jahre";137302;;149742;;47486;;
+;"30 bis 44 Jahre";95077;;119063;;32418;;
+;"45 bis 59 Jahre";43185;;50688;;13560;;
+;"60 bis 74 Jahre";16685;;19775;;5470;;
+;"75 Jahre und älter";14022;;14936;;2144;;
+"2021";"bis 14 Jahre";50558;;66584;;16289;;
+;"15 bis 29 Jahre";138427;;146935;;51920;;
+;"30 bis 44 Jahre";96842;;118160;;35437;;
+;"45 bis 59 Jahre";43295;;50081;;14269;;
+;"60 bis 74 Jahre";18553;;21423;;6422;;
+;"75 Jahre und älter";15700;;16437;;2467;;
+"2022";"bis 14 Jahre";56326;;71823;;18001;;
+;"15 bis 29 Jahre";149021;;151801;;59385;;
+;"30 bis 44 Jahre";107656;;126710;;40369;;
+;"45 bis 59 Jahre";46381;;53601;;15747;;
+;"60 bis 74 Jahre";21436;;24403;;7410;;
+;"75 Jahre und älter";16376;;16618;;2735;;
+"2023";"bis 14 Jahre";55602;;71876;;19125;;
+;"15 bis 29 Jahre";145298;;154537;;58764;;
+;"30 bis 44 Jahre";103195;;128838;;38200;;
+;"45 bis 59 Jahre";45133;;52516;;15230;;
+;"60 bis 74 Jahre";20562;;23824;;7136;;
+;"75 Jahre und älter";16555;;16861;;2513;;
+
+
+Symbol;Beschreibung
+"Q";"STATcube – Statistische Datenbank von STATISTIK AUSTRIA"
+"Wanderungen innerhalb Österreichs ab 2002";".) Datenprovenienz: Die Wanderungsstatistik wird von der Statistik Austria erstellt und basiert auf den Daten (An- und Abmeldungen) des Zentralen Melderegisters (ZMR). Wanderungen innerhalb Österreichs (Binnenwanderungen) sind Hauptwohnsitzverlegungen innerhalb Österreichs. Neben Wanderungen über administrative Grenzen (z.B. Bundesland-, Bezirks- oder Gemeindegrenzen) hinweg werden auch Hauptwohnsitz- wechsel innerhalb derselben Gemeinde von der Wanderungsstatistik erfasst. Weitere Metadaten: https://www.statistik.at/fileadmin/shared/QM/Standarddokumentationen/B_2/std_b_wanderungsstatistik.pdf weitere Informationen finden Sie unter: Weitere Metadaten: https://www.statistik.at/statistiken/bevoelkerung-und-soziales/bevoelkerung/migration-und-einbuergerung .) Gesetzliche Grundlagen: Die Wanderungsstatistik ist eine im Sinne des Par.4.(1) BstatG angeordnete Statistik. Die Datenübermittlung der für die Wanderungsstatsitik benötigten Meldedaten ist im Par.16b(6) MeldeG geregelt. .) Aktualisierung: Jährlich im Mai für die Wanderungsstatistik des Vorjahres. Letzte Änderung des Würfels [26.05.2025] .) Bearbeitungsnachweis: Direktion Bevölkerung - Demographie Für allgemeine Anfragen: Tel.: +43 1 711 28-7070 Bei Spezialfragen wenden Sie sich bitte schriftlich an demographie@statistik.gv.at"
+
+
+(c) Copyright Statistics Austria

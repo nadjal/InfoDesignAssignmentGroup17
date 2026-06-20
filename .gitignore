@@ -4,6 +4,7 @@ __pycache__/
 .env
 data/*.db
 data/cache/
+!data/cache/altersdaten.csv
 .DS_Store
 *.egg-info/
 dist/

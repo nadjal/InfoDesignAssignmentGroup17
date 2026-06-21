@@ -22,13 +22,13 @@
   <p>
     Select a year to explore how migration patterns have changed over time.
     The data displays <strong>net-migration</strong> — the difference between in-migration and out-migration.
-    <span class="highlight-green">green areas</span> indicate population gains, while
-    <span class="highlight-red">pink areas</span> indicate population losses.
+    <span class="highlight-blue">blue areas</span> indicate population gains, while
+    <span class="highlight-red">red areas</span> indicate population losses.
   </p>
   <div class="karte-year-row">
-    <span class="karte-year-label">Jahr:</span>
+    <span class="karte-year-label">Year:</span>
     <select id="karte-year-select" class="year-pill-select">
-      <option value="">Alle Jahre</option>
+      <option value="">All years</option>
     </select>
   </div>
 </div>
@@ -56,8 +56,8 @@
         <h2>Where Do People Move?</h2>
         <p>Every year, more than <strong>200.000 Menschen</strong> in Austria change their place of residence.
           The map shows net migration by federal state -
-           <span class="highlight-green">green areas</span> gain population, while
-            <span class="highlight-red">pink areas</span>
+           <span class="highlight-blue">blue areas</span> gain population, while
+            <span class="highlight-red">red areas</span>
            experience population loss.</p>
       </div>
     </div>
@@ -78,7 +78,7 @@
         <div class="step-num">03 — Comparison</div>
         <h2>In-Migration and Out-Migration by Federal State</h2>
         <p>Each district is represented by a point.
-          Points <span class="highlight-green">to the right of the center</span>
+          Points <span class="highlight-blue">to the right</span> of the center
           experience more in-migration than out-migration, while points
           <span class="highlight-red">to the left</span> are losing population.</p>
         <div class="chart-legend-box">
@@ -111,7 +111,7 @@
         <h2>How Many People Actually Move?</h2>
         <p>Behind every net migration value are real migration movements:
           <span class="highlight-red">out-migration</span> to the left,
-          <span class="highlight-green">in-migration</span> to the right.
+          <span class="highlight-blue">in-migration</span> to the right.
           Federal states with both high in-migration <em>and</em> high out-migration
           are particularly dynamic — people are moving in and out in large numbers.</p>
       </div>
@@ -122,7 +122,7 @@
         <div class="step-num">05 — Net Migration Ranking</div>
         <h2>Who Gains, Who Loses?</h2>
         <p>In-migration minus out-migration results in <strong>net migration</strong> — the overall balance of each federal state.
-          <span class="highlight-green">Positive values</span> indicate population growth,
+          <span class="highlight-blue">Positive values</span> indicate population growth,
           while <span class="highlight-red">negative values</span> indicate population decline.
           Federal states are ranked according to this value.</p>
       </div>
@@ -141,7 +141,7 @@
     more than 2,000 municipalities in detail.
   </p>
   <a href="{{ url_for('main.gemeinde') }}" class="cta-button">
-    open Municipality-Explorer
+    To the Municipality explorer
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>

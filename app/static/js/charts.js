@@ -898,7 +898,7 @@ function _levelForZoom(zoom) {
 
 function fetchGeoJSON(level) {
   if (!_geojsonPromises[level])
-    _geojsonPromises[level] = fetchJSON(_GEOJSON_URLS[level]);
+    _geojsonPromises[level] = fetchJSON(_GEOJSON_URLS[level]); // get data to bundesland, district or commune
   return _geojsonPromises[level];
 }
 
@@ -919,7 +919,7 @@ function _lerpColor(hex1, hex2, t) {
 
 // 95th-percentile absolute value — prevents outliers from washing out the colour scale.
 function _p95(data, metric) {
-  const vals = data.map(d => Math.abs(d[metric])).sort((a, b) => a - b);
+  const vals = data.map(d => Math.abs(d[metric])).sort((a, b) => a - b); // sort ascending
   return Math.max(vals[Math.floor(vals.length * 0.95)] ?? vals[vals.length - 1] ?? 1, 1);
 }
 
@@ -933,13 +933,13 @@ function _choroColor(val, metric, maxAbs) {
 }
 
 function _tooltipContent(name, d) {
-  if (!d) return `<b>${name}</b><br>Keine Daten`;
+  if (!d) return `<b>${name}</b><br>No data`;
   const sign = d.netto >= 0 ? '+' : '';
   return `<b>${name}</b><br>Net: <b>${sign}${fmt(d.netto)}</b><br>In-Migration: ${fmt(d.zuzug)}<br>Out-Migration: ${fmt(d.wegzug)}`;
 }
 
 function _addLegend(map, metric, maxAbs) {
-  const TITLES = { netto: 'Netto-Migration', zuzug: 'Zuzug', wegzug: 'Wegzug' };
+  const TITLES = { netto: 'Net migration', zuzug: 'In-Migration', wegzug: 'Out-Migration' };
   const grad = metric === 'netto'
       ? 'linear-gradient(to right,#D73027,#F7F7F7,#4575B4)'
       : 'linear-gradient(to right,#EFF6FF,#1E3A5F)';
@@ -952,9 +952,9 @@ function _addLegend(map, metric, maxAbs) {
     topEl.innerHTML =
         `<div class="leg-title">${TITLES[metric] || metric}</div>` +
         `<div class="leg-bar">` +
-        `<span class="leg-lbl leg-lbl-left">${lo}</span>` +
-        `<span class="leg-grad" style="background:${grad}"></span>` +
-        `<span class="leg-lbl leg-lbl-right">${hi}</span>` +
+        `<span class="leg-lbl leg-lbl-left">${lo}</span>` + // left shows lowest
+        `<span class="leg-grad" style="background:${grad}"></span>` + // colour scale
+        `<span class="leg-lbl leg-lbl-right">${hi}</span>` + // right shows highest
         `</div>`;
     // Kein Leaflet-Control nötig — Dummy mit .remove() zurückgeben
     return {
@@ -986,14 +986,26 @@ function initChoroplethMap(id, onZoom) {
   const el = document.getElementById(id);
   if (!el) return;
   
-  const map = L.map(el, { zoomControl: true, attributionControl: false, renderer: L.canvas() });
-  map.fitBounds([[46.38, 9.6], [48.85, 17.1]], { paddingTopLeft: [10, 10], paddingBottomRight: [10, 36] });
-  _leafletMaps[id] = { map, layer: null, legend: null, level: null, dataMap: null };
+  const map = L.map(el, {
+    zoomControl: true,
+    attributionControl: false, // remove logo
+    renderer: L.canvas()
+  });
+  map.fitBounds([[46.38, 9.6], [48.85, 17.1]], // Austria coordinates
+      { paddingTopLeft: [10, 10],
+        paddingBottomRight: [10, 36] }
+  );
+  _leafletMaps[id] = {
+    map, layer: null,
+    legend: null,
+    level: null,
+    dataMap: null
+  };
   
   let _zoomTimer = null;
   map.on('zoomend', () => {
     clearTimeout(_zoomTimer);
-    _zoomTimer = setTimeout(() => onZoom(map.getZoom()), 120);
+    _zoomTimer = setTimeout(() => onZoom(map.getZoom()), 120); // bundle many zoom calls to one (wait 120ms before actually zooming)
   });
   
   // Pre-warm all GeoJSON + API data immediately in background
@@ -1146,10 +1158,10 @@ function renderGeoMap(id, data, metric = 'netto') {
     customdata: data.map(d => [d.zuzug, d.ausziehend, d.netto, d.total]),
     hovertemplate:
         '<b>%{text}</b><br>' +
-        'Zuzug:  %{customdata[0]:,.0f}<br>' +
-        'Wegzug: %{customdata[1]:,.0f}<br>' +
-        'Netto:  %{customdata[2]:,.0f}<br>' +
-        'Gesamt: %{customdata[3]:,.0f}' +
+        'In-Migration:  %{customdata[0]:,.0f}<br>' +
+        'Out-Migration: %{customdata[1]:,.0f}<br>' +
+        'Net:  %{customdata[2]:,.0f}<br>' +
+        'Total: %{customdata[3]:,.0f}' +
         '<extra></extra>',
   }], {
     paper_bgcolor: 'transparent',

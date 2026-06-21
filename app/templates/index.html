@@ -43,10 +43,10 @@
   <div class="container">
     <div class="year-bar-inner">
       <span class="control-label">Year</span>
-      <button class="year-step-btn" id="dash-btn-prev" title="Vorheriges Jahr">‹</button>
+      <button class="year-step-btn" id="dash-btn-prev" title="Prior year">‹</button>
       <span class="year-display" id="dash-year-display">—</span>
       <input type="range" id="dash-year-slider" class="year-range" min="0" max="0" value="0">
-      <button class="year-step-btn" id="dash-btn-next" title="Nächstes Jahr">›</button>
+      <button class="year-step-btn" id="dash-btn-next" title="Next year">›</button>
       <button class="year-play-btn" id="dash-btn-play" title="Animation">▶</button>
       <button class="chip chip-btn" id="dash-btn-all">All Years</button>
       <span class="year-bar-hint">Time series always displays all years</span>
@@ -130,6 +130,7 @@
   <h2 class="karte-intro-title" style="font-size:1.4rem;">Would you like to explore internal migration patterns within Austria’s federal states?</h2>
   <p style="color:var(--text-muted); margin-bottom:1.5rem;">
     The interactive map visualizes in-migration, out-migration, and net migration at the federal state, district, and municipality levels.
+    <br>
   <a href="{{ url_for('main.karte') }}" class="cta-button">
     To the Map
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

@@ -8,125 +8,130 @@
 
 {% block content %}
 <div class="gem-section container">
-  <div class="page-title" style="text-align:left;">Municipality-Explorer</div>
-  <div class="page-sub" style="text-align:left; margin-bottom:1rem;">Migration Flows for a Single Municipality</div>
-  {% if content_intro %}
-  <div class="prose" style="margin-bottom:1.5rem;">{{ content_intro | safe }}</div>
-  {% endif %}
-  <p class="gem-map-label">Choose a municipality on the map</p>
+    <div class="page-title" style="text-align:left;">Municipality-Explorer</div>
+    <div class="page-sub" style="text-align:left; margin-bottom:1rem;">Migration Flows for a Single Municipality</div>
+    {% if content_intro %}
+    <div class="prose" style="margin-bottom:1.5rem;">{{ content_intro | safe }}</div>
+    {% endif %}
+    <p class="gem-map-label">Choose a municipality on the map</p>
 
-  <!-- Gemeinde-Choropleth-Karte -->
-  <div class="gem-map-wrap">
-    <div id="gem-map"></div>
-    <div id="gem-map-legend" class="gem-map-legend"></div>
-    <div id="gem-map-tooltip" class="chart-tooltip"></div>
-  </div>
+    <!-- Gemeinde-Choropleth-Karte -->
+    <div class="gem-map-wrap">
+        <div id="gem-map"></div>
+        <div id="gem-map-legend" class="gem-map-legend"></div>
+        <div id="gem-map-tooltip" class="chart-tooltip"></div>
+    </div>
 
-  <p class="gem-map-label">Or search directly for your municipality</p>
+    <p class="gem-map-label">Or search directly for your municipality</p>
 
-  <div class="search-wrap gem-search-wrap">
-    <input type="text" id="gemeinde-input" class="search-input"
-           placeholder="Gemeindenamen eingeben …" autocomplete="off">
-    <div id="search-dropdown" class="search-dropdown"></div>
-  </div>
+    <div class="search-wrap gem-search-wrap">
+        <input type="text" id="gemeinde-input" class="search-input"
+               placeholder="Gemeindenamen eingeben …" autocomplete="off">
+        <div id="search-dropdown" class="search-dropdown"></div>
+    </div>
 </div>
 
 <div class="content" style="padding-top:0;">
-  <div class="container">
+    <div class="container">
 
-    <div id="gemeinde-results" style="display:none;">
-        <div class="year-bar" style="margin-bottom:1.25rem;">
-            <div class="container">
-                <div class="year-bar-inner">
-                    <span class="control-label">Year</span>
-                    <button class="year-step-btn" id="gem-btn-prev" title="Vorheriges Jahr">‹</button>
-                    <span class="year-display" id="gem-year-display">—</span>
-                    <input type="range" id="gem-year-slider" class="year-range" min="0" max="0" value="0">
-                    <button class="year-step-btn" id="gem-btn-next" title="Nächstes Jahr">›</button>
-                    <button class="year-play-btn" id="gem-btn-play" title="Animation">▶</button>
-                    <button class="chip chip-btn" id="gem-btn-all">All years</button>
+        <div id="gemeinde-results" style="display:none;">
+            <div class="year-bar" style="margin-bottom:1.25rem;">
+                <div class="container">
+                    <div class="year-bar-inner">
+                        <span class="control-label">Year</span>
+                        <button class="year-step-btn" id="gem-btn-prev" title="Vorheriges Jahr">‹</button>
+                        <span class="year-display" id="gem-year-display">—</span>
+                        <input type="range" id="gem-year-slider" class="year-range" min="0" max="0" value="0">
+                        <button class="year-step-btn" id="gem-btn-next" title="Nächstes Jahr">›</button>
+                        <button class="year-play-btn" id="gem-btn-play" title="Animation">▶</button>
+                        <button class="chip chip-btn" id="gem-btn-all">All years</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-      <div class="section grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Where do people move?</div>
-              <div class="card-subtitle" id="nach-subtitle">Top-5 Destination Municipalities (All Years)</div>
+            <div class="section grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Where do people move?</div>
+                            <div class="card-subtitle" id="nach-subtitle">Top-5 Destination Municipalities (All Years)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>municipality</th>
+                                <th>federal state</th>
+                                <th class="num">amount</th>
+                            </tr>
+                            </thead>
+                            <tbody id="top-nach-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Where do people come from?</div>
+                            <div class="card-subtitle" id="von-subtitle">Top-5 Origin Municipalities (All Years)</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>municipality</th>
+                                <th>federal state</th>
+                                <th class="num">amount</th>
+                            </tr>
+                            </thead>
+                            <tbody id="top-von-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr>
-                <th>municipality</th>
-                <th>federal state</th>
-                <th class="num">amount</th>
-              </tr></thead>
-              <tbody id="top-nach-body"></tbody>
-            </table>
-          </div>
+
+            <!-- Piktogramm -->
+            <div id="pictogram-wrap" class="pict-wrap"></div>
+
         </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Where do people come from? </div>
-              <div class="card-subtitle" id="von-subtitle">Top-5 Origin Municipalities (All Years)</div>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr>
-                <th>municipality</th>
-                <th>federal state</th>
-                <th class="num">amount</th>
-              </tr></thead>
-              <tbody id="top-von-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Piktogramm -->
-      <div id="pictogram-wrap" class="pict-wrap"></div>
 
     </div>
-
-  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
   let gemeinden = [];
-  let activeGkz  = null;
+  let activeGkz = null;
   let activeName = null;
-  let gemYear    = null;
-  let gemYears   = [];
+  let gemYear = 2023;
+  let gemYears = [];
 
   async function initSearch() {
     gemeinden = await fetchJSON('/api/gemeinden');
     gemYears = await fetchJSON('/api/years');
 
     initYearSlider({
-      years:     gemYears,
-      sliderId:  'gem-year-slider',
+      years: gemYears,
+      sliderId: 'gem-year-slider',
       displayId: 'gem-year-display',
-      btnAllId:  'gem-btn-all',
+      btnAllId: 'gem-btn-all',
       btnPrevId: 'gem-btn-prev',
       btnNextId: 'gem-btn-next',
       btnPlayId: 'gem-btn-play',
-      onChange:  (year) => {
+      onChange: (year) => {
         gemYear = year;
         if (window.updateGemMapYear) updateGemMapYear(year);
         if (activeGkz) loadGemeinde(activeGkz, activeName);
       },
     });
 
-    const input    = document.getElementById('gemeinde-input');
+    const input = document.getElementById('gemeinde-input');
     const dropdown = document.getElementById('search-dropdown');
 
     input.addEventListener('input', function () {
@@ -136,8 +141,8 @@
       if (q.length < 2) return;
 
       const matches = gemeinden
-        .filter(g => g.name && g.name.toLowerCase().includes(q))
-        .slice(0, 10);
+          .filter(g => g.name && g.name.toLowerCase().includes(q))
+          .slice(0, 10);
       if (!matches.length) return;
 
       matches.forEach(g => {
@@ -148,7 +153,7 @@
           input.value = g.name;
           dropdown.classList.remove('open');
           dropdown.innerHTML = '';
-          activeGkz  = g.gkz;
+          activeGkz = g.gkz;
           activeName = g.name;
           if (window.highlightGemeindeOnMap) highlightGemeindeOnMap(g.gkz);
           loadGemeinde(g.gkz, g.name);
@@ -163,15 +168,16 @@
     });
   }
 
-  async function loadGemeinde(gkz, name) {
-    const url  = `/api/gemeinde_top?gkz=${gkz}${gemYear ? '&year=' + gemYear : ''}`;
-    const data = await fetchJSON(url);
-    const yearLabel = gemYear ? `Jahr ${gemYear}` : 'alle Jahre';
 
-    document.getElementById('nach-subtitle').textContent = `Top-5 Destination Municipalities for ${name} (${yearLabel})`;
-    document.getElementById('von-subtitle').textContent  = `Top-5 Origin Municipalities for ${name} (${yearLabel})`;
-    document.getElementById('top-nach-body').innerHTML   = renderTopRows(data.top_nach);
-    document.getElementById('top-von-body').innerHTML    = renderTopRows(data.top_von);
+  async function loadGemeinde(gkz, name) {
+    const url = `/api/gemeinde_top?gkz=${gkz}${gemYear ? '&year=' + gemYear : ''}`;
+    const data = await fetchJSON(url);
+    const yearLabel = gemYear ? `Year ${gemYear}` : 'all years';
+
+    document.getElementById('nach-subtitle').textContent = `Top 5 Destination Municipalities for ${name} (${yearLabel})`;
+    document.getElementById('von-subtitle').textContent = `Top 5 Origin Municipalities for ${name} (${yearLabel})`;
+    document.getElementById('top-nach-body').innerHTML = renderTopRows(data.top_nach);
+    document.getElementById('top-von-body').innerHTML = renderTopRows(data.top_von);
     document.getElementById('gemeinde-results').style.display = 'block';
     renderPictogram(data.top_von, data.top_nach);
   }
@@ -180,40 +186,46 @@
     const wrap = document.getElementById('pictogram-wrap');
     if (!wrap) return;
 
-    const GREEN = ['#193808','#2f5c13','#4d9221','#72bc35','#b8e896'];
-    const PINK  = ['#540a36','#8b1258','#c51b7d','#e967b4','#f9b2dc'];
+    const COLOR_NEG = '#B31529';
+    const COLOR_MID = '#F7F7F7';
+    const COLOR_POS = '#1065AB';
 
-    const totalZ = top_von.reduce( (s,r) => s + r.anzahl, 0);
-    const totalW = top_nach.reduce((s,r) => s + r.anzahl, 0);
+    const BLUE = ['#1065AB', '#3079A1', '#5DAAD0', '#8EC4DE', '#D1E5F0'];
+    const RED = ['#B31529', '#D75F4C', '#FC995F', '#F6A482', '#FEDBC7'];
+
+    const totalZ = top_von.reduce((s, r) => s + r.anzahl, 0);
+    const totalW = top_nach.reduce((s, r) => s + r.anzahl, 0);
 
     const IW = 64, IH = 92, GAP_X = 16, GAP_Y = 20;
     const cellW = IW + GAP_X;
-    const rowH  = IH + GAP_Y;
+    const rowH = IH + GAP_Y;
     const ICONS_PER_ROW = 6;
-    const GAP_BL     = 10;
+    const GAP_BL = 10;
     const GAP_CENTER = 36;
-    const sideW      = ICONS_PER_ROW * cellW;
+    const sideW = ICONS_PER_ROW * cellW;
 
     function buildData(rows, total, shades) {
       return rows.map((r, i) => {
         const pct = total > 0 ? r.anzahl / total * 100 : 0;
         const raw = pct / 5;
-        return { color: shades[Math.min(i, shades.length-1)],
-                 pct, full: Math.floor(raw), frac: raw - Math.floor(raw), label: r.name };
+        return {
+          color: shades[Math.min(i, shades.length - 1)],
+          pct, full: Math.floor(raw), frac: raw - Math.floor(raw), label: r.name
+        };
       });
     }
 
     const totalAll = totalZ + totalW;
-    const zData = buildData(top_von,  totalAll, GREEN);
-    const wData = buildData(top_nach, totalAll, PINK);
+    const zData = buildData(top_von, totalAll, BLUE);
+    const wData = buildData(top_nach, totalAll, RED);
 
     function computeBlocks(data) {
       let y = 0;
       return data.map(row => {
-        const nIcons   = row.full + (row.frac > 0.05 ? 1 : 0);
+        const nIcons = row.full + (row.frac > 0.05 ? 1 : 0);
         const nSubRows = Math.max(1, Math.ceil(nIcons / ICONS_PER_ROW));
-        const blockH   = nSubRows * rowH;
-        const block    = { ...row, y, blockH };
+        const blockH = nSubRows * rowH;
+        const block = { ...row, y, blockH };
         y += blockH + GAP_BL;
         return block;
       });
@@ -221,8 +233,8 @@
 
     const wBlocks = computeBlocks(wData);
     const zBlocks = computeBlocks(zData);
-    const wTotalH = wBlocks.reduce((s,b) => s + b.blockH + GAP_BL, 0);
-    const zTotalH = zBlocks.reduce((s,b) => s + b.blockH + GAP_BL, 0);
+    const wTotalH = wBlocks.reduce((s, b) => s + b.blockH + GAP_BL, 0);
+    const zTotalH = zBlocks.reduce((s, b) => s + b.blockH + GAP_BL, 0);
     const svgH = Math.max(wTotalH, zTotalH) + 22;
     const svgW = sideW * 2 + GAP_CENTER;
     let defs = '', elems = '', clipN = 0;
@@ -239,71 +251,71 @@
         elems += `<g transform="translate(${x},${y})" fill="${color}"><g transform="${scale}">${body}</g></g>`;
       } else {
         const id = `pc${clipN++}`;
-        const cx = fromRight ? (IW*(1-frac)).toFixed(2) : '0';
-        const cw = (frac*IW).toFixed(2);
-        defs  += `<clipPath id="${id}"><rect x="${cx}" y="0" width="${cw}" height="${IH}"/></clipPath>`;
+        const cx = fromRight ? (IW * (1 - frac)).toFixed(2) : '0';
+        const cw = (frac * IW).toFixed(2);
+        defs += `<clipPath id="${id}"><rect x="${cx}" y="0" width="${cw}" height="${IH}"/></clipPath>`;
         elems += `<g transform="translate(${x},${y})" fill="${color}" clip-path="url(#${id})"><g transform="${scale}">${body}</g></g>`;
       }
     }
 
-    const lineX    = sideW + GAP_CENTER / 2;
-    const leftEdge  = sideW;
+    const lineX = sideW + GAP_CENTER / 2;
+    const leftEdge = sideW;
     const rightEdge = sideW + GAP_CENTER;
 
     wBlocks.forEach(block => {
       let n = 0;
       for (let i = 0; i < block.full; i++, n++) {
-        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
-        personAt(leftEdge - (pos+1)*cellW, block.y + sr*rowH, block.color, 1);
+        const sr = Math.floor(n / ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(leftEdge - (pos + 1) * cellW, block.y + sr * rowH, block.color, 1);
       }
       if (block.frac > 0.05) {
-        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
-        personAt(leftEdge - (pos+1)*cellW, block.y + sr*rowH, block.color, block.frac, true);
+        const sr = Math.floor(n / ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(leftEdge - (pos + 1) * cellW, block.y + sr * rowH, block.color, block.frac, true);
       }
     });
 
     zBlocks.forEach(block => {
       let n = 0;
       for (let i = 0; i < block.full; i++, n++) {
-        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
-        personAt(rightEdge + pos*cellW, block.y + sr*rowH, block.color, 1);
+        const sr = Math.floor(n / ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(rightEdge + pos * cellW, block.y + sr * rowH, block.color, 1);
       }
       if (block.frac > 0.05) {
-        const sr = Math.floor(n/ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
-        personAt(rightEdge + pos*cellW, block.y + sr*rowH, block.color, block.frac, false);
+        const sr = Math.floor(n / ICONS_PER_ROW), pos = n % ICONS_PER_ROW;
+        personAt(rightEdge + pos * cellW, block.y + sr * rowH, block.color, block.frac, false);
       }
     });
 
     wrap.innerHTML = `
       <div class="pict-header">
-        <span class="pict-title" style="color:#c51b7d">Out-Migration: ${totalW.toLocaleString('de-AT')}</span>
-        <span class="pict-title" style="color:#4d9221">In-Migration: ${totalZ.toLocaleString('de-AT')}</span>
+        <span class="pict-title highlight-red">Out-Migration: ${totalW.toLocaleString('de-AT')}</span>
+        <span class="pict-title highlight-blue">In-Migration: ${totalZ.toLocaleString('de-AT')}</span>
       </div>
       <div class="pict-body">
         <svg class="pict-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
           <defs>${defs}</defs>
           ${elems}
-          <line x1="${lineX}" y1="0" x2="${lineX}" y2="${svgH-20}"
+          <line x1="${lineX}" y1="0" x2="${lineX}" y2="${svgH - 20}"
                 stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-          <text x="${svgW/2}" y="${svgH-4}" text-anchor="middle"
+          <text x="${svgW / 2}" y="${svgH - 4}" text-anchor="middle"
                 fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 figure = 5 %</text>
         </svg>
       </div>`;
 
     requestAnimationFrame(() => {
-      const bodyEl  = wrap.querySelector('.pict-body');
-      const svgEl   = wrap.querySelector('svg');
-      const svgRect  = svgEl.getBoundingClientRect();
+      const bodyEl = wrap.querySelector('.pict-body');
+      const svgEl = wrap.querySelector('svg');
+      const svgRect = svgEl.getBoundingClientRect();
       const bodyRect = bodyEl.getBoundingClientRect();
-      const scale    = svgRect.width / svgW;
-      const svgLeft  = svgRect.left - bodyRect.left;
+      const scale = svgRect.width / svgW;
+      const svgLeft = svgRect.left - bodyRect.left;
       const svgRight = bodyRect.right - svgRect.right;
 
       wBlocks.forEach(block => {
         const el = document.createElement('div');
         el.className = 'pict-block-name pict-block-name--left';
         el.textContent = block.label;
-        el.style.top   = ((block.y + block.blockH / 2) * scale) + 'px';
+        el.style.top = ((block.y + block.blockH / 2) * scale) + 'px';
         el.style.width = Math.max(svgLeft - 8, 0) + 'px';
         bodyEl.appendChild(el);
       });
@@ -312,7 +324,7 @@
         const el = document.createElement('div');
         el.className = 'pict-block-name pict-block-name--right';
         el.textContent = block.label;
-        el.style.top   = ((block.y + block.blockH / 2) * scale) + 'px';
+        el.style.top = ((block.y + block.blockH / 2) * scale) + 'px';
         el.style.width = Math.max(svgRight - 8, 0) + 'px';
         bodyEl.appendChild(el);
       });
@@ -320,7 +332,7 @@
   }
 
   function renderTopRows(rows) {
-    if (!rows.length) return '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Keine Daten</td></tr>';
+    if (!rows.length) return '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:2rem 0;">No data.</td></tr>';
     return rows.map((r, i) => `
       <tr>
         <td><span class="rank">${i + 1}</span> ${r.name || '—'}</td>
@@ -334,17 +346,18 @@
 
   /* ── Gemeinde-Choropleth-Karte ─────────────────────────────── */
   (async function initGemMap() {
-    const COLOR_NEG = '#c51b7d';
-    const COLOR_MID = '#f7f7f7';
-    const COLOR_POS = '#4d9221';
+    const COLOR_NEG = '#B31529';
+    const COLOR_MID = '#F7F7F7';
+    const COLOR_POS = '#1065AB';
+
 
     function lerpColor(a, b, t) {
       const h = s => parseInt(s, 16);
       const r = c => c.slice(1);
       const lerp = (x, y) => Math.round(x + (y - x) * t);
-      return '#' + ['rr','gg','bb'].map((_, i) => {
-        const ai = h(r(a).slice(i*2, i*2+2));
-        const bi = h(r(b).slice(i*2, i*2+2));
+      return '#' + ['rr', 'gg', 'bb'].map((_, i) => {
+        const ai = h(r(a).slice(i * 2, i * 2 + 2));
+        const bi = h(r(b).slice(i * 2, i * 2 + 2));
         return lerp(ai, bi).toString(16).padStart(2, '0');
       }).join('');
     }
@@ -354,9 +367,9 @@
       fetchJSON('/api/choropleth?level=gemeinden&year=2023'),
     ]);
 
-    const dataMap    = Object.fromEntries(choro.map(d => [d.iso, d]));
+    const dataMap = Object.fromEntries(choro.map(d => [d.iso, d]));
     const featureMap = Object.fromEntries(geo.features.map(f => [String(f.properties.iso), f]));
-    const nettos  = choro.map(d => d.netto);
+    const nettos = choro.map(d => d.netto);
     const dataMin = Math.min(...nettos);
     const dataMax = Math.max(...nettos);
 
@@ -379,7 +392,7 @@
     });
 
     const initialBounds = [[46.38, 9.6], [48.85, 17.1]];
-    const initialPad    = { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10] };
+    const initialPad = { paddingTopLeft: [10, 10], paddingBottomRight: [10, 10] };
 
     map.fitBounds(initialBounds, initialPad);
     map.setMinZoom(map.getZoom());
@@ -396,21 +409,24 @@
 
     window.highlightGemeindeOnMap = function (gkz) {
       const iso = String(gkz);
-      const f   = featureMap[iso];
-      const d   = dataMap[iso];
+      const f = featureMap[iso];
+      const d = dataMap[iso];
       if (f && d) highlightGemeinde(f, d.netto);
     };
 
     function highlightGemeinde(feature, netto) {
-      if (_highlightLayer) { map.removeLayer(_highlightLayer); _highlightLayer = null; }
+      if (_highlightLayer) {
+        map.removeLayer(_highlightLayer);
+        _highlightLayer = null;
+      }
       _highlightLayer = L.geoJSON(feature, {
         renderer: L.svg(),
         style: {
-          fillColor:   gemColor(netto),
+          fillColor: gemColor(netto),
           fillOpacity: 1,
-          color:       '#ffffff',
-          weight:      2,
-          className:   'gem-highlight',
+          color: '#ffffff',
+          weight: 2,
+          className: 'gem-highlight',
         },
         interactive: false,
       }).addTo(map);
@@ -420,12 +436,12 @@
 
     function styleFeature(f) {
       const iso = String(f.properties.iso);
-      const d   = currentDataMap[iso];
+      const d = currentDataMap[iso];
       return {
-        fillColor:   d ? gemColor(d.netto) : COLOR_MID,
+        fillColor: d ? gemColor(d.netto) : COLOR_MID,
         fillOpacity: 0.85,
-        color:       'rgba(0,0,0,0.15)',
-        weight:      0.3,
+        color: 'rgba(0,0,0,0.15)',
+        weight: 0.3,
       };
     }
 
@@ -444,16 +460,18 @@
         layer.on('mousemove', function (e) {
           const rect = document.getElementById('gem-map').getBoundingClientRect();
           tip.style.left = (e.originalEvent.clientX - rect.left + 14) + 'px';
-          tip.style.top  = (e.originalEvent.clientY - rect.top  - 36) + 'px';
+          tip.style.top = (e.originalEvent.clientY - rect.top - 36) + 'px';
         });
-        layer.on('mouseout', () => { tip.style.opacity = '0'; });
+        layer.on('mouseout', () => {
+          tip.style.opacity = '0';
+        });
         layer.on('click', function () {
           const d = currentDataMap[iso];
           if (!d) return;
           const name = d.name || f.properties.name;
           const input = document.getElementById('gemeinde-input');
           if (input) input.value = name;
-          activeGkz  = iso;
+          activeGkz = iso;
           activeName = name;
           highlightGemeinde(f, d.netto);
           loadGemeinde(iso, name);
@@ -463,8 +481,8 @@
 
     window.updateGemMapYear = async function (year) {
       const url = year
-        ? `/api/choropleth?level=gemeinden&year=${year}`
-        : '/api/choropleth?level=gemeinden&year=2023';
+          ? `/api/choropleth?level=gemeinden&year=${year}`
+          : '/api/choropleth?level=gemeinden&year=2023';
       const newChoro = await fetchJSON(url);
       currentDataMap = Object.fromEntries(newChoro.map(d => [d.iso, d]));
       geojsonLayer.setStyle(styleFeature);
@@ -472,12 +490,12 @@
 
     /* Legende */
     const zeroPos = ((-dataMin / (dataMax - dataMin)) * 100).toFixed(1);
-    const legend  = document.getElementById('gem-map-legend');
-    const fmtL    = n => n.toLocaleString('de-AT');
+    const legend = document.getElementById('gem-map-legend');
+    const fmtL = n => n.toLocaleString('de-AT');
     legend.innerHTML =
-      `<span>${fmtL(dataMin)}</span>` +
-      `<span class="leg-grad" style="background:linear-gradient(to right,${COLOR_NEG} 0%,${COLOR_MID} ${zeroPos}%,${COLOR_POS} 100%)"></span>` +
-      `<span>+${fmtL(dataMax)}</span>`;
+        `<span>${fmtL(dataMin)}</span>` +
+        `<span class="leg-grad" style="background:linear-gradient(to right,${COLOR_NEG} 0%,${COLOR_MID} ${zeroPos}%,${COLOR_POS} 100%)"></span>` +
+        `<span>+${fmtL(dataMax)}</span>`;
   })();
 </script>
 {% endblock %}

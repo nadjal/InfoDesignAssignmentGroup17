@@ -856,8 +856,8 @@ td.negative { color: var(--danger);  font-weight: 600; }
   line-height: 1.7;
 }
 
-.highlight-green { color: #10B981; font-weight: 600; }
-.highlight-red   { color: #EF4444; font-weight: 600; }
+.highlight-blue { color: #1065AB; font-weight: 600; }
+.highlight-red   { color: #B31529; font-weight: 600; }
 
 /* Loading overlay inside story-graphic */
 .scroll-loading {
@@ -1060,11 +1060,10 @@ td.negative { color: var(--danger);  font-weight: 600; }
 .karte-dark .leaflet-container {
   background: #1a2535;
 }
-
-.karte-dark .highlight-green,
-.karte-intro .highlight-green { color: #4d9221; }
+.karte-dark .highlight-blue,
+.karte-intro .highlight-blue { color: #1065AB; }
 .karte-dark .highlight-red,
-.karte-intro .highlight-red   { color: #c51b7d; }
+.karte-intro .highlight-red   { color: #B31529; }
 
 /* ── Chart-Legende ────────────────────────────────────────────────── */
 .chart-legend-box {

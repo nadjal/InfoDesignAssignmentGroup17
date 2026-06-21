@@ -438,7 +438,7 @@
           const d = currentDataMap[iso];
           if (!d) return;
           const sign = d.netto >= 0 ? '+' : '';
-          tip.innerHTML = `<strong>${d.name || f.properties.name}</strong><br>Netto: ${sign}${d.netto.toLocaleString('de-AT')}`;
+          tip.innerHTML = `<strong>${d.name || f.properties.name}</strong><br>Net: ${sign}${d.netto.toLocaleString('de-AT')}`;
           tip.style.opacity = '1';
         });
         layer.on('mousemove', function (e) {

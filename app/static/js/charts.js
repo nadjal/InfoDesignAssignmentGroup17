@@ -650,7 +650,7 @@ function _choroColor(val, metric, maxAbs) {
 function _tooltipContent(name, d) {
   if (!d) return `<b>${name}</b><br>Keine Daten`;
   const sign = d.netto >= 0 ? '+' : '';
-  return `<b>${name}</b><br>Netto: <b>${sign}${fmt(d.netto)}</b><br>Zuzug: ${fmt(d.zuzug)}<br>Wegzug: ${fmt(d.wegzug)}`;
+  return `<b>${name}</b><br>Net: <b>${sign}${fmt(d.netto)}</b><br>In-Migration: ${fmt(d.zuzug)}<br>Out-Migration: ${fmt(d.wegzug)}`;
 }
 
 function _addLegend(map, metric, maxAbs) {

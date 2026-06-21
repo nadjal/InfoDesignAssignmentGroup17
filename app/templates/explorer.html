@@ -24,13 +24,13 @@
       <div class="card-header"><div class="card-title">Filter</div></div>
       <div class="card-body">
         <div class="filters">
-          <select id="f-year"     class="filter-select"><option value="">Alle Jahre</option></select>
-          <select id="f-von-bl"   class="filter-select"><option value="">Von: Alle Bundesländer</option></select>
-          <select id="f-nach-bl"  class="filter-select"><option value="">Nach: Alle Bundesländer</option></select>
-          <select id="f-geschl"   class="filter-select"><option value="">Alle Geschlechter</option></select>
-          <select id="f-staat"    class="filter-select"><option value="">Alle Staatsbürgerschaften</option></select>
-          <button class="btn-primary" onclick="applyFilters()">Filtern</button>
-          <button class="btn-ghost"   onclick="resetFilters()">Zurücksetzen</button>
+          <select id="f-year"     class="filter-select"><option value="">All Year</option></select>
+          <select id="f-von-bl"   class="filter-select"><option value="">From: All Federal States</option></select>
+          <select id="f-nach-bl"  class="filter-select"><option value="">To: All Federal States</option></select>
+          <select id="f-geschl"   class="filter-select"><option value="">All Genders</option></select>
+          <select id="f-staat"    class="filter-select"><option value="">Every Citizenship</option></select>
+          <button class="btn-primary" onclick="applyFilters()">filter</button>
+          <button class="btn-ghost"   onclick="resetFilters()">reset</button>
         </div>
       </div>
     </div>
@@ -38,31 +38,31 @@
     <div class="card">
       <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
         <div>
-          <div class="card-title">Ergebnisse</div>
+          <div class="card-title">Outcomes</div>
           <div class="card-subtitle" id="result-info">—</div>
         </div>
-        <a id="csv-link" class="btn-ghost btn-sm" href="/api/explorer/csv" download>CSV herunterladen</a>
+        <a id="csv-link" class="btn-ghost btn-sm" href="/api/explorer/csv" download>download CSV</a>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Jahr</th>
-              <th>Von Gemeinde</th>
-              <th>Von Bezirk</th>
-              <th>Von Bundesland</th>
-              <th>Nach Gemeinde</th>
-              <th>Nach Bezirk</th>
-              <th>Nach Bundesland</th>
-              <th>Geschlecht</th>
-              <th>Staatsbürgerschaft</th>
-              <th class="num">Anzahl</th>
+              <th>Year</th>
+              <th>From Municipality</th>
+              <th>From District</th>
+              <th>From Federal State</th>
+              <th>To Municipality</th>
+              <th>To District</th>
+              <th>To Federal State</th>
+              <th>Gender</th>
+              <th>Citizenship</th>
+              <th class="num">Amount</th>
             </tr>
           </thead>
           <tbody id="explorer-body">
             <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:3rem 0;">
-              Filter setzen und auf "Filtern" klicken
+              Set filter and click "filter"
             </td></tr>
           </tbody>
         </table>

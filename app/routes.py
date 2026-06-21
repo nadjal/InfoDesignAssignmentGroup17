@@ -53,7 +53,7 @@ def _rows(df):
     return df.where(df.notna(), other=None).to_dict(orient='records')
 
 
-# ── Pages ──────────────────────────────────────────────────────────────────
+# --- Pages ----------------------------------------------------------------------------------
 
 @bp.route('/')
 def index():
@@ -82,7 +82,7 @@ def gemeinde():
     )
 
 
-# ── API routes ──────────────────────────────────────────────────────────────
+# --- API routes ----------------------------------------------------------------------------------
 
 @bp.route('/api/overview')
 def api_overview():
@@ -98,7 +98,7 @@ def api_overview():
 
 @bp.route('/api/years')
 def api_years():
-    years = sorted(int(y) for y in _df()['jahr'].dropna().unique())
+    years = sorted(int(y) for y in _df()['jahr'].dropna().unique()) # sorted years
     return jsonify(years)
 
 
@@ -117,25 +117,26 @@ def api_timeseries():
     result = (
         _df()
         .groupby(['jahr', 'geschlecht'], dropna=True)['anzahl']
-        .sum().reset_index()
+        .sum() # count total number of migration of gender per year
+        .reset_index()
         .rename(columns={'anzahl': 'total'})
-        .sort_values(['jahr', 'geschlecht'])
+        .sort_values(['jahr', 'geschlecht']) # first sort per year, then per gender
         .astype({'jahr': int, 'total': int})
     )
-    return jsonify(_rows(result))
+    return jsonify(_rows(result)) # _rows() needed, because result is still pandas
 
 
 @bp.route('/api/bundeslaender')
 def api_bundeslaender():
-    df  = _filter_year(_df(), request.args.get('year'))
-    aus = df.groupby('von_bundesland')['anzahl'].sum()
-    zu  = df.groupby('nach_bundesland')['anzahl'].sum()
-    bls = sorted(set(aus.index.tolist()) | set(zu.index.tolist()))
+    df  = _filter_year(_df(), request.args.get('year')) # request.args.get gets year from url like /api/bundeslaender?year=2005
+    aus = df.groupby('von_bundesland')['anzahl'].sum() # count total number of migration away per bundesland
+    zu  = df.groupby('nach_bundesland')['anzahl'].sum() # count total number of migration to per bundesland
+    bls = sorted(set(aus.index.tolist()) | set(zu.index.tolist())) # get every "mentioned" bundesland
     result = [
         {
             'bundesland': bl,
-            'ausziehend': int(aus.get(bl, 0) or 0),
-            'zuzug':      int(zu.get(bl, 0) or 0),
+            'ausziehend': int(aus.get(bl, 0) or 0), # .get(bl, 0) returns sum for bundesland or 0, if nan
+            'zuzug':      int(zu.get(bl, 0) or 0), # additional safety with "or 0" in case bl is nan
             'netto':      int((zu.get(bl, 0) or 0) - (aus.get(bl, 0) or 0)),
         }
         for bl in bls if bl and str(bl) != 'nan'
@@ -145,10 +146,11 @@ def api_bundeslaender():
 
 @bp.route('/api/staatsbuergerschaft')
 def api_staatsbuergerschaft():
-    df = _filter_year(_df(), request.args.get('year'))
+    df = _filter_year(_df(), request.args.get('year')) # request.args.get gets year from url like /api/bundeslaender?year=2005
     result = (
         df.groupby('staatsbuergerschaft', dropna=True)['anzahl']
-        .sum().reset_index()
+        .sum() # count total number of migration of staatsbuergerschaft
+        .reset_index()
         .rename(columns={'anzahl': 'total'})
         .sort_values('total', ascending=False)
         .astype({'total': int})
@@ -161,7 +163,9 @@ def api_timeseries_staatsbuergerschaft():
     df = _df()
     top = (
         df.groupby('staatsbuergerschaft', dropna=True)['anzahl']
-        .sum().nlargest(8).index.tolist()
+        .sum() # count total number of migration of staatsbuergerschaft
+        .nlargest(8) # take 8 biggest values
+        .index.tolist()
     )
     df = df[df['staatsbuergerschaft'].isin(top)]
     result = (
@@ -187,7 +191,7 @@ def api_timeseries_bundeslaender():
         .sum().reset_index()
         .rename(columns={'von_bundesland': 'bundesland', 'anzahl': 'wegzug'})
     )
-    merged = zuzug.merge(wegzug, on=['jahr', 'bundesland'], how='outer').fillna(0)
+    merged = zuzug.merge(wegzug, on=['jahr', 'bundesland'], how='outer').fillna(0) # outer takes all entries from both tables, merges on same bundesland and year
     merged['netto'] = merged['zuzug'] - merged['wegzug']
     merged = (merged
         .sort_values(['bundesland', 'jahr'])
@@ -198,8 +202,8 @@ def api_timeseries_bundeslaender():
 
 @bp.route('/api/sankey')
 def api_sankey():
-    df = _filter_year(_df(), request.args.get('year'))
-    df = df[df['von_bundesland'] != df['nach_bundesland']]
+    df = _filter_year(_df(), request.args.get('year')) # request.args.get gets year from url like /api/bundeslaender?year=2005
+    df = df[df['von_bundesland'] != df['nach_bundesland']] # remove entries from bundesland to same bundesland
     flows = (
         df.groupby(['von_bundesland', 'nach_bundesland'], dropna=True)['anzahl']
         .sum().reset_index()
@@ -212,7 +216,7 @@ def api_sankey():
         'bundeslaender': bundeslaender,
         'flows': [
             {'von': str(r['von_bundesland']), 'nach': str(r['nach_bundesland']), 'total': int(r['total'])}
-            for _, r in flows.iterrows()
+            for _, r in flows.iterrows() # go from line to line in data frame (r is line, _ is index, but is not important here)
         ],
     })
 
@@ -225,10 +229,12 @@ def api_migration_typen():
     for jahr, g in df.groupby('jahr'):
         zwischen_bl  = int(g[g['von_bundesland'] != g['nach_bundesland']]['anzahl'].sum())
         innerhalb_bl = int(g[(g['von_bundesland'] == g['nach_bundesland']) & (g['von_gkz'] != g['nach_gkz'])]['anzahl'].sum())
-        innerhalb_gm = int(g[g['von_gkz'] == g['nach_gkz']]['anzahl'].sum())
+        innerhalb_gm = int(g[(g['von_bundesland'] == g['nach_bundesland']) & (g['von_gkz'] == g['nach_gkz'])]['anzahl'].sum())
         total = zwischen_bl + innerhalb_bl + innerhalb_gm
+
         if total == 0:
             continue
+
         result.append({
             'jahr': int(jahr),
             'zwischen_bundeslaender': zwischen_bl,
@@ -241,7 +247,7 @@ def api_migration_typen():
 
 @bp.route('/api/altersgruppen')
 def api_altersgruppen():
-    year = request.args.get('year', type=int)
+    year = request.args.get('year', type=int) # request.args.get gets year from url like /api/bundeslaender?year=2005
     df = _df_alter()
     if year:
         df = df[df['jahr'] == year]
@@ -249,10 +255,10 @@ def api_altersgruppen():
         return jsonify([])
     grouped = df.groupby('altersgruppe')[['ueber_gemeindegrenzen', 'innerhalb_gemeinde', 'zwischen_bundeslaendern']].sum().reset_index()
     ORDER = ['bis 14 Jahre', '15 bis 29 Jahre', '30 bis 44 Jahre', '45 bis 59 Jahre', '60 bis 74 Jahre', '75 Jahre und älter']
-    grouped['_sort'] = grouped['altersgruppe'].map(lambda x: ORDER.index(x) if x in ORDER else 99)
-    grouped = grouped.sort_values('_sort').drop(columns='_sort')
+    grouped['_sort'] = grouped['altersgruppe'].map(lambda x: ORDER.index(x) if x in ORDER else 99) # add and fill _sort with indices
+    grouped = grouped.sort_values('_sort').drop(columns='_sort') # sort along _sort, then remove column
     result = []
-    for _, row in grouped.iterrows():
+    for _, row in grouped.iterrows(): # index _ is not important here
         ueber  = int(row['ueber_gemeindegrenzen'] or 0)
         inn_gm = int(row['innerhalb_gemeinde'] or 0)
         zw_bl  = int(row['zwischen_bundeslaendern'] or 0)
@@ -275,7 +281,7 @@ def api_choropleth():
     key = (level, year)
     if key not in _choropleth_cache:
         df = _filter_year(_df(), year)
-        df = df.dropna(subset=['von_gkz', 'nach_gkz']).copy()
+        df = df.dropna(subset=['von_gkz', 'nach_gkz']).copy() # remove lines where either von or nach is missing
         n        = {'bundeslaender': 1, 'bezirke': 3, 'gemeinden': 5}[level]
         iso_von  = df['von_gkz'].astype(int).astype(str).str[:n]
         iso_nach = df['nach_gkz'].astype(int).astype(str).str[:n]
@@ -292,13 +298,13 @@ def api_choropleth():
         } for iso in isos]
 
     resp = jsonify(_choropleth_cache[key])
-    resp.headers['Cache-Control'] = 'public, max-age=3600'
+    resp.headers['Cache-Control'] = 'public, max-age=3600' # safe in cache for up to 1 hour
     return resp
 
 
 @bp.route('/api/karte')
 def api_karte():
-    df  = _filter_year(_df(), request.args.get('year'))
+    df  = _filter_year(_df(), request.args.get('year')) # request.args.get gets year from url like /api/bundeslaender?year=2005
     aus = df.groupby('von_bundesland')['anzahl'].sum()
     zu  = df.groupby('nach_bundesland')['anzahl'].sum()
     result = [
@@ -330,7 +336,7 @@ def api_gemeinden():
 
 @bp.route('/api/gemeinde_top')
 def api_gemeinde_top():
-    gkz = request.args.get('gkz', type=int)
+    gkz = request.args.get('gkz', type=int) # request.args.get gets gkz from url like /api/bundeslaender?gkz=12345
     if not gkz:
         return jsonify({'error': 'gkz required'}), 400
 
@@ -339,19 +345,19 @@ def api_gemeinde_top():
     df = _filter_year(df, request.args.get('year'))
 
     top_nach = (
-        df[(df['von_gkz'] == gkz) & (df['nach_gkz'] != gkz)]
+        df[(df['von_gkz'] == gkz) & (df['nach_gkz'] != gkz)] # starting von this gemeinde away to (different) gemeinde
         .groupby(['nach_gkz', 'nach_gemeinde', 'nach_bundesland'])['anzahl'].sum()
         .reset_index()
         .rename(columns={'nach_gkz': 'gkz', 'nach_gemeinde': 'name', 'nach_bundesland': 'bundesland', 'anzahl': 'anzahl'})
-        .nlargest(5, 'anzahl')
+        .nlargest(5, 'anzahl') # get top 5
         .astype({'anzahl': int})
     )
     top_von = (
-        df[(df['nach_gkz'] == gkz) & (df['von_gkz'] != gkz)]
+        df[(df['nach_gkz'] == gkz) & (df['von_gkz'] != gkz)] # coming to this gemeinde from a (different) gemeinde
         .groupby(['von_gkz', 'von_gemeinde', 'von_bundesland'])['anzahl'].sum()
         .reset_index()
         .rename(columns={'von_gkz': 'gkz', 'von_gemeinde': 'name', 'von_bundesland': 'bundesland', 'anzahl': 'anzahl'})
-        .nlargest(5, 'anzahl')
+        .nlargest(5, 'anzahl') # get top 5
         .astype({'anzahl': int})
     )
     return jsonify({'top_nach': _rows(top_nach), 'top_von': _rows(top_von)})
@@ -364,8 +370,8 @@ def _apply_explorer_filters(df, args):
     geschl  = args.get('geschlecht')
     staat   = args.get('staatsbuergerschaft')
 
-    mask = pd.Series(True, index=df.index)
-    if year:    mask &= df['jahr'] == int(year)
+    mask = pd.Series(True, index=df.index) # fill with true
+    if year:    mask &= df['jahr'] == int(year) # and mask with table entries (both must be true to remain true)
     if von_bl:  mask &= df['von_bundesland'] == von_bl
     if nach_bl: mask &= df['nach_bundesland'] == nach_bl
     if geschl:  mask &= df['geschlecht'] == geschl
@@ -375,11 +381,11 @@ def _apply_explorer_filters(df, args):
 
 @bp.route('/api/explorer')
 def api_explorer():
-    page     = max(1, int(request.args.get('page', 1)))
-    per_page = min(200, int(request.args.get('per_page', 50)))
+    page     = max(1, int(request.args.get('page', 1))) # at least 1 entry
+    per_page = min(200, int(request.args.get('per_page', 50))) # usually 50 entries at once, but up to 200 possible
     filtered = _apply_explorer_filters(_df(), request.args)
     total    = len(filtered)
-    page_df  = filtered[EXPLORER_COLS].iloc[(page - 1) * per_page: page * per_page]
+    page_df  = filtered[EXPLORER_COLS].iloc[(page - 1) * per_page: page * per_page] # calculate indices for each page
     return jsonify({'total': total, 'page': page, 'per_page': per_page, 'data': _rows(page_df)})
 
 

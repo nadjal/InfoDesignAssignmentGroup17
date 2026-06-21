@@ -2,10 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Internal Migration Austria{% endblock %}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- correct scaling (fit width) -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   {% block head %}{% endblock %}
 </head>
@@ -20,8 +17,8 @@
       <ul class="nav-links">
         <li><a href="/"         class="nav-link {% if request.endpoint == 'main.index'    %}active{% endif %}">Overview</a></li>
         <li><a href="/karte"    class="nav-link {% if request.endpoint == 'main.karte'    %}active{% endif %}">Map</a></li>
-        <li><a href="/gemeinde" class="nav-link {% if request.endpoint == 'main.gemeinde' %}active{% endif %}">Municipality-Explorer</a></li>
-        <li><a href="/explorer" class="nav-link {% if request.endpoint == 'main.explorer' %}active{% endif %}">Data-Explorer</a></li>
+        <li><a href="/gemeinde" class="nav-link {% if request.endpoint == 'main.gemeinde' %}active{% endif %}">Municipality explorer</a></li>
+        <li><a href="/explorer" class="nav-link {% if request.endpoint == 'main.explorer' %}active{% endif %}">Data explorer</a></li>
       </ul>
     </div>
   </nav>
@@ -30,12 +27,15 @@
 
   <footer class="footer">
     <div class="container">
-      <p>Data: <a href="https://www.statistik.at" target="_blank" rel="noopener">Statistik Austria</a>
-         &middot; visualization: internal migration austria</p>
+      <p>Data:
+        <a href="https://www.data.gv.at/datasets/2d8c43fc-e0bd-389c-b15b-1d6787ed554f?locale=de" target="_blank" rel="noopener">Offene Daten Österreich, </a>
+        <a href="https://www.statistik.at" target="_blank" rel="noopener">Statistik Austria</a>
+         &middot; Visualization: Internal migration in Austria</p>
     </div>
   </footer>
 
   <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
   {% block scripts %}{% endblock %}
+
 </body>
 </html>

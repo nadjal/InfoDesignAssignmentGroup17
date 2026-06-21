@@ -225,10 +225,10 @@
 
   function updateYearMigrationStat(year) {
     const el = document.getElementById('year-migration-stat');
-    if (!el || !_migrationTypenData) return;
-    const avg = Math.round(_migrationTypenData.reduce((s, d) => s + d.total, 0) / _migrationTypenData.length);
+    if (!el || !migrationTypenData) return;
+    const avg = Math.round(migrationTypenData.reduce((s, d) => s + d.total, 0) / migrationTypenData.length);
     if (!year) { el.textContent = ''; return; }
-    const row = _migrationTypenData.find(d => d.jahr === year);
+    const row = migrationTypenData.find(d => d.jahr === year);
     if (!row) { el.textContent = ''; return; }
     const diff = row.total - avg;
     const pct  = Math.abs(Math.round(diff / avg * 100));

@@ -103,6 +103,10 @@
         <div class="prose">{{ content_sankey | safe }}</div>
         {% endif %}
 
+        {% if content_timeseries %}
+        <div class="prose">{{ content_timeseries | safe }}</div>
+        {% endif %}
+
         <div class="section">
             <div class="card">
                 <div class="card-header">

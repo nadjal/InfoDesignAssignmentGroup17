@@ -16,5 +16,7 @@ This dashboard provides an interactive overview of internal migration in Austria
 net migration balances, demographic characteristics, and long-term trends across municipalities, districts, 
 and federal states over the period 2002–2023.
 
-Data source: [Offene Daten Österreich](https://www.data.gv.at/datasets/2d8c43fc-e0bd-389c-b15b-1d6787ed554f?locale=de),
-[Statistik Austria](https://www.statistik.at).
+Data source: 
+[Offene Daten Österreich](https://www.data.gv.at/datasets/2d8c43fc-e0bd-389c-b15b-1d6787ed554f?locale=de),
+[Statistik Austria Open Data](https://data.statistik.gv.at/data/OGDEXT_BINNENWAND_1.zip), 
+[STATcube](https://statcube.at/statistik.at/ext/statcube/jsf/tableView/tableView.xhtml).

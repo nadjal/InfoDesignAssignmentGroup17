@@ -10,15 +10,16 @@ Interactive visualisation of internal migration in Austria, based on data from S
 
 ## Data sources
 
+- Migration flows with gender and nationality data: [Offene Daten Österreich](https://www.data.gv.at/datasets/2d8c43fc-e0bd-389c-b15b-1d6787ed554f?locale=de)
 - Migration flows: [Statistik Austria Open Data](https://data.statistik.gv.at/data/OGDEXT_BINNENWAND_1.zip)
-- Municipality register: [Statistik Austria Registerzählung](https://www.statistik.at/fileadmin/pages/453/RegGemVz2024.ods)
+- Migration flows with age data: [STATcube](https://statcube.at/statistik.at/ext/statcube/jsf/tableView/tableView.xhtml)
 
 Data is downloaded automatically on first startup and cached locally.
 
 ## Getting started
 
 ```bash
-docker compose up --build
+docker compose up --buildy
 ```
 
 Open in browser: [http://localhost:5000](http://localhost:5000)

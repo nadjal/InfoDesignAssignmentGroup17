@@ -288,8 +288,8 @@
 
     wrap.innerHTML = `
       <div class="pict-header">
-        <span class="pict-title highlight-red">Out-Migration: ${totalW.toLocaleString('de-AT')}</span>
-        <span class="pict-title highlight-blue">In-Migration: ${totalZ.toLocaleString('de-AT')}</span>
+        <span class="pict-title highlight-red">Emigration: ${totalW.toLocaleString('de-AT')}</span>
+        <span class="pict-title highlight-blue">Immigration: ${totalZ.toLocaleString('de-AT')}</span>
       </div>
       <div class="pict-body">
         <svg class="pict-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
@@ -298,7 +298,7 @@
           <line x1="${lineX}" y1="0" x2="${lineX}" y2="${svgH - 20}"
                 stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
           <text x="${svgW / 2}" y="${svgH - 4}" text-anchor="middle"
-                fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 figure = 5 %</text>
+                fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 figure = 5% of total immigration and emigration in the municipality</text>
         </svg>
       </div>`;
 

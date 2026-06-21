@@ -551,6 +551,10 @@ td.negative { color: var(--danger);  font-weight: 600; }
   transition: all var(--tr);
 }
 
+.filter-button {
+  color: black;
+}
+
 .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 

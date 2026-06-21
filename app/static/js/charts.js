@@ -392,7 +392,8 @@ async function renderTimeseries(id, highlightYear = null) {
       plot_bgcolor: '#1A2535',
       hovermode: 'x unified', // show accumulated information at x
       xaxis: {
-        gridcolor: '#FFFFFF10' // grid helper lines
+        gridcolor: '#FFFFFF10', // grid helper lines
+        range: [2002, 2023]
       },
       yaxis: {
         tickformat: ',.0f',
@@ -555,7 +556,8 @@ async function renderStaatsbuergerschaft(id) {
       plot_bgcolor: '#1A2535',
       hovermode: 'x unified', // show accumulated information at x
       xaxis: {
-        gridcolor: '#FFFFFF10' // grid helper lines
+        gridcolor: '#FFFFFF10', // grid helper lines
+        range: [2002, 2023]
       },
       yaxis: {
         tickformat: ',.0f',
@@ -701,7 +703,8 @@ async function renderJahresvergleich(id) {
       plot_bgcolor: '#1A2535',
       hovermode: 'x unified',
       xaxis: {
-        gridcolor: '#FFFFFF10' // grid helper lines
+        gridcolor: '#FFFFFF10', // grid helper lines
+        range: [2002, 2023]
       },
       yaxis: {
         tickformat: ',.0f',
@@ -775,7 +778,8 @@ async function renderMigrationTypenZeitreihe(id) {
       plot_bgcolor: '#1A2535',
       hovermode: 'x unified', // show accumulated information at x
       xaxis: {
-        gridcolor: '#FFFFFF10' // grid helper lines
+        gridcolor: '#FFFFFF10', // grid helper lines
+        range: [2002, 2023]
       },
       yaxis: {
         tickformat: ',.0f',
@@ -848,7 +852,8 @@ async function renderTimeseriesBundeslaender(id) {
       plot_bgcolor: '#1A2535',
       hovermode: 'x unified',
       xaxis: {
-        gridcolor: '#FFFFFF10' // grid helper lines
+        gridcolor: '#FFFFFF10', // grid helper lines
+        range: [2002, 2023]
       },
       yaxis: {
         tickformat: '+,.0f',
@@ -935,11 +940,11 @@ function _choroColor(val, metric, maxAbs) {
 function _tooltipContent(name, d) {
   if (!d) return `<b>${name}</b><br>No data`;
   const sign = d.netto >= 0 ? '+' : '';
-  return `<b>${name}</b><br>Net: <b>${sign}${fmt(d.netto)}</b><br>In-Migration: ${fmt(d.zuzug)}<br>Out-Migration: ${fmt(d.wegzug)}`;
+  return `<b>${name}</b><br>Net: <b>${sign}${fmt(d.netto)}</b><br>Immigration: ${fmt(d.zuzug)}<br>Emigration: ${fmt(d.wegzug)}`;
 }
 
 function _addLegend(map, metric, maxAbs) {
-  const TITLES = { netto: 'Net migration', zuzug: 'In-Migration', wegzug: 'Out-Migration' };
+  const TITLES = { netto: 'Net migration', zuzug: 'Immigration', wegzug: 'Emigration' };
   const grad = metric === 'netto'
       ? 'linear-gradient(to right,#D73027,#F7F7F7,#4575B4)'
       : 'linear-gradient(to right,#EFF6FF,#1E3A5F)';
@@ -1158,8 +1163,8 @@ function renderGeoMap(id, data, metric = 'netto') {
     customdata: data.map(d => [d.zuzug, d.ausziehend, d.netto, d.total]),
     hovertemplate:
         '<b>%{text}</b><br>' +
-        'In-Migration:  %{customdata[0]:,.0f}<br>' +
-        'Out-Migration: %{customdata[1]:,.0f}<br>' +
+        'Immigration:  %{customdata[0]:,.0f}<br>' +
+        'Emigration: %{customdata[1]:,.0f}<br>' +
         'Net:  %{customdata[2]:,.0f}<br>' +
         'Total: %{customdata[3]:,.0f}' +
         '<extra></extra>',

@@ -468,7 +468,7 @@
         .attr('fill', '#64748b')
         .attr('font-size', '11px')
         .attr('font-family', 'Inter, sans-serif')
-        .text('Net-Migration per District (In-Migration - Out-Migration)');
+        .text('Net-Migration per District (Immigration - Emigration)');
     
     /* Y-Labels (Bundesland-Namen) — neutral, da Farbe den Wert codiert */
     BL_ORDER.forEach(bl => {

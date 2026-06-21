@@ -8,242 +8,238 @@
 {% block content %}
 
 <section class="hero">
-  <div class="container">
-    <div class="hero-eyebrow">
-      <span class="eyebrow-dot"></span>
-      Statistik Austria &middot; Austria
-    </div>
-    <h1>Where Do People Move Within<em> Austria</em>?</h1>
-    <p class="hero-sub">
-      Interactive visualization of internal migration — where people move to, where they come from, and how
-      migration patterns have evolved over time
-    </p>
+    <div class="container">
+        <h1>Where Do People Move Within<em> Austria</em>?</h1>
+        <p class="hero-sub">
+            Interactive visualization of internal migration — where people move to, where they come from, and how migration patterns have evolved over time
+        </p>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Recorded migration movements</div>
-        <div class="stat-value" id="counter-total">—</div>
-        <div class="stat-sub">Total across all years</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Observation period</div>
-        <div class="stat-value" id="counter-years">—</div>
-        <div class="stat-sub" id="counter-years-range"></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Municipalities</div>
-        <div class="stat-value" id="counter-gemeinden">—</div>
-        <div class="stat-sub">austrian municipalities</div>
-      </div>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Recorded migration movements</div>
+                <div class="stat-value" id="counter-total">—</div>
+                <div class="stat-sub">Total across all years</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Observation period</div>
+                <div class="stat-value" id="counter-years">—</div>
+                <div class="stat-sub" id="counter-years-range"></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Municipalities</div>
+                <div class="stat-value" id="counter-gemeinden">—</div>
+                <div class="stat-sub">Austrian municipalities</div>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
 <div class="year-bar">
-  <div class="container">
-    <div class="year-bar-inner">
-      <span class="control-label">Year</span>
-      <button class="year-step-btn" id="dash-btn-prev" title="Prior year">‹</button>
-      <span class="year-display" id="dash-year-display">—</span>
-      <input type="range" id="dash-year-slider" class="year-range" min="0" max="0" value="0">
-      <button class="year-step-btn" id="dash-btn-next" title="Next year">›</button>
-      <button class="year-play-btn" id="dash-btn-play" title="Animation">▶</button>
-      <button class="chip chip-btn" id="dash-btn-all">All Years</button>
-      <span class="year-bar-hint">Time series always displays all years</span>
+    <div class="container">
+        <div class="year-bar-inner">
+            <span class="control-label">Year</span>
+            <button class="year-step-btn" id="dash-btn-prev" title="Prior year">‹</button>
+            <span class="year-display" id="dash-year-display">—</span>
+            <input type="range" id="dash-year-slider" class="year-range" min="0" max="0" value="0">
+            <button class="year-step-btn" id="dash-btn-next" title="Next year">›</button>
+            <button class="year-play-btn" id="dash-btn-play" title="Animation">▶</button>
+            <button class="chip chip-btn" id="dash-btn-all">All Years</button>
+        </div>
     </div>
-  </div>
 </div>
 
 {% if content_intro %}
 <div class="content" style="padding-bottom:0;">
-  <div class="container">
-    <div class="prose">{{ content_intro | safe }}</div>
-    <p id="year-migration-stat" class="hero-year-stat"></p>
-  </div>
+    <div class="container">
+        <div class="prose">{{ content_intro | safe }}</div>
+        <p id="year-migration-stat" class="hero-year-stat"></p>
+    </div>
 </div>
 {% endif %}
 
 <div class="content">
-  <div class="container">
+    <div class="container">
 
-    <div class="section grid-2">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Type of Migration</div>
-            <div class="card-subtitle">Migration Types by Spatial Scope</div>
-          </div>
+        <div class="section grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Type of Migration</div>
+                        <div class="card-subtitle">Migration types by Spatial Scope (within municipality is not counted twice within federal state)</div>
+                    </div>
+                </div>
+                <div class="card-body chart-wrap">
+                    <div id="chart-migration-typen" style="min-height:340px;"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Migration by Age Group</div>
+                        <div class="card-subtitle" id="bl-subtitle">Total number of migration type by age group (within municipality is not counted twice within federal state)</div>
+                    </div>
+                </div>
+                <div class="card-body chart-wrap">
+                    <div id="chart-bundeslaender" style="min-height:340px;"></div>
+                </div>
+            </div>
         </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-migration-typen" style="min-height:340px;"></div>
+
+        <div class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Migration Flows between Federal States</div>
+                        <div class="card-subtitle" id="sankey-subtitle">Migration flows between each combination of federal states</div>
+                    </div>
+                </div>
+                <div class="card-body chart-wrap">
+                    <div id="chart-sankey" style="min-height:480px;"></div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Migration by Age Group</div>
-            <div class="card-subtitle" id="bl-subtitle">Type of Migration by Age Group</div>
-          </div>
+
+        {% if content_sankey %}
+        <div class="prose">{{ content_sankey | safe }}</div>
+        {% endif %}
+
+        <div class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Net Migration by Federal State Over Time</div>
+                        <div class="card-subtitle">n-Migration Minus Emigration per Federal State and Year</div>
+                    </div>
+                </div>
+                <div class="card-body chart-wrap">
+                    <div id="chart-timeseries-bl" style="min-height:360px;"></div>
+                </div>
+            </div>
         </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-bundeslaender" style="min-height:340px;"></div>
-        </div>
-      </div>
+
     </div>
-
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Migration Flows Between Federal States</div>
-            <div class="card-subtitle" id="sankey-subtitle">Top Migration Flows Between Federal States</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-sankey" style="min-height:480px;"></div>
-        </div>
-      </div>
-    </div>
-
-    {% if content_sankey %}
-    <div class="prose">{{ content_sankey | safe }}</div>
-    {% endif %}
-
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Net Migration by Federal State Over Time</div>
-            <div class="card-subtitle">n-Migration Minus Out-Migration per Federal State and Year</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-timeseries-bl" style="min-height:360px;"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </div>
 
 <div class="karte-intro container" style="text-align:center; padding: 3rem 1rem;">
-  <h2 class="karte-intro-title" style="font-size:1.4rem;">Would you like to explore internal migration patterns within Austria’s federal states?</h2>
-  <p style="color:var(--text-muted); margin-bottom:1.5rem;">
-    The interactive map visualizes in-migration, out-migration, and net migration at the federal state, district, and municipality levels.
-    <br>
-  <a href="{{ url_for('main.karte') }}" class="cta-button">
-    To the Map
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
-  <p id="scroll-hint" style="color:var(--text-muted); margin-top:2rem; font-size:0.95rem;">
-  Or would you like to take a closer look at how different aspects of internal migration have evolved over time? Then scroll down ↓
-  </p>
+    <h2 class="karte-intro-title" style="font-size:1.4rem;">Would you like to explore internal migration patterns within
+        Austria’s federal states?</h2>
+    <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+        The interactive map visualizes immigration, emigration, and net migration at the federal state, district,
+        and municipality levels.
+        <br>
+        <a href="{{ url_for('main.karte') }}" class="cta-button">
+            To the Map
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+        </a>
+    <p id="scroll-hint" style="color:var(--text-muted); margin-top:2rem; font-size:0.95rem;">
+        Or would you like to take a closer look at how different aspects of internal migration have evolved over time? Then scroll down.
+    <span class="year-bar-hint">Time series always displays all years</span>
+    </p>
 </div>
 
 <div id="extended-content" style="opacity:0; transition: opacity 0.6s ease;">
-<div class="content">
-  <div class="container">
+    <div class="content">
+        <div class="container">
 
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Year-to-Year Comparison</div>
-            <div class="card-subtitle">Migration Movements per Year Compared to the Annual Average</div>
-          </div>
+            <div class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Year-to-Year Comparison</div>
+                            <div class="card-subtitle">Migration Movements per Year Compared to the Annual Average</div>
+                        </div>
+                    </div>
+                    <div class="card-body chart-wrap">
+                        <div id="chart-jahresvergleich" style="min-height:320px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Type of Migration Over Time</div>
+                            <div class="card-subtitle">Development of Migration Types by Spatial Scope</div>
+                        </div>
+                    </div>
+                    <div class="card-body chart-wrap">
+                        <div id="chart-migration-typen-zeitreihe" style="min-height:360px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {% if content_timeseries %}
+            <div class="prose">{{ content_timeseries | safe }}</div>
+            {% endif %}
+
+            <div class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Gender</div>
+                            <div class="card-subtitle">Development of Internal Migration by Year and Gender</div>
+                        </div>
+                    </div>
+                    <div class="card-body chart-wrap">
+                        <div id="chart-timeseries" style="min-height:360px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Citizenship</div>
+                            <div class="card-subtitle">Development of Internal Migration by Citizenship</div>
+                        </div>
+                    </div>
+                    <div class="card-body chart-wrap">
+                        <div id="chart-staatsbuergerschaft" style="min-height:340px;"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-jahresvergleich" style="min-height:320px;"></div>
-        </div>
-      </div>
     </div>
-
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Type of Migration Over Time</div>
-            <div class="card-subtitle">Development of Migration Types by Spatial Scope</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-migration-typen-zeitreihe" style="min-height:360px;"></div>
-        </div>
-      </div>
-    </div>
-
-    {% if content_timeseries %}
-    <div class="prose">{{ content_timeseries | safe }}</div>
-    {% endif %}
-
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Gender</div>
-            <div class="card-subtitle">Development of Internal Migration by Year and Gender</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-timeseries" style="min-height:360px;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Citizenship</div>
-            <div class="card-subtitle">Development of Internal Migration by Citizenship</div>
-          </div>
-        </div>
-        <div class="card-body chart-wrap">
-          <div id="chart-staatsbuergerschaft" style="min-height:340px;"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </div>
-</div><!-- /extended-content -->
+
+<!-- /extended-content -->
 {% endblock %}
 
 {% block scripts %}
 <script>
-  let dashYear  = null;
+  let dashYear = 2023;
   let dashYears = [];
-
-  function setSubtitles(year) {
-    const label = year ? `Jahr ${year}` : 'All years';
-    const bl    = document.getElementById('bl-subtitle');
-    const sankey = document.getElementById('sankey-subtitle');
-    if (bl)     bl.textContent     = `Net-Migration — ${label}`;
-    if (sankey) sankey.textContent = `Migration Flows — ${label}`;
-  }
 
   function updateYearMigrationStat(year) {
     const el = document.getElementById('year-migration-stat');
     if (!el || !migrationTypenData) return;
-    const avg = Math.round(migrationTypenData.reduce((s, d) => s + d.total, 0) / migrationTypenData.length);
-    if (!year) { el.textContent = ''; return; }
+    const avg = Math.round(migrationTypenData.reduce((s, d) => s + d.total, 0) / migrationTypenData.length); // average over all years
+    if (!year) {
+      el.textContent = '';
+      return;
+    }
     const row = migrationTypenData.find(d => d.jahr === year);
-    if (!row) { el.textContent = ''; return; }
+    if (!row) {
+      el.textContent = '';
+      return;
+    }
     const diff = row.total - avg;
-    const pct  = Math.abs(Math.round(diff / avg * 100));
-    const dir  = diff >= 0 ? 'more' : 'less';
-    el.innerHTML = `Im Jahr <strong>${year}</strong> wanderten <strong>${fmt(row.total)}</strong> Personen innerhalb Österreichs — das ist <strong>${pct} % ${dir}</strong> als der Jahresdurchschnitt von ${fmt(avg)} Personen.`;
+    const pct = Math.abs(Math.round(diff / avg * 100));
+    const dir = diff >= 0 ? 'more' : 'less';
+    el.innerHTML = `In year <strong>${year}</strong> <strong>${fmt(row.total)}</strong> people in Austria migrated internally — that is <strong>${pct} % ${dir}</strong> than the annual average of ${fmt(avg)} people.`;
   }
 
-  function updateDashCharts() {
-    setSubtitles(dashYear);
+  async function updateDashCharts() {
+    await renderMigrationTypen('chart-migration-typen', dashYear);
     updateYearMigrationStat(dashYear);
-    renderMigrationTypen('chart-migration-typen', dashYear);
     renderAltersgruppen('chart-bundeslaender', dashYear);
     renderSankey('chart-sankey', dashYear);
-    if (extendedRendered) renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
   }
 
   async function initDashboard() {
@@ -251,31 +247,40 @@
     initOverview();
 
     initYearSlider({
-      years:     dashYears,
-      sliderId:  'dash-year-slider',
+      years: dashYears,
+      sliderId: 'dash-year-slider',
       displayId: 'dash-year-display',
-      btnAllId:  'dash-btn-all',
+      btnAllId: 'dash-btn-all',
       btnPrevId: 'dash-btn-prev',
       btnNextId: 'dash-btn-next',
       btnPlayId: 'dash-btn-play',
-      onChange:  (year) => {
+      onChange: (year) => {
         dashYear = year;
-        const marker = year ? [{ type: 'line', x0: year, x1: year, y0: 0, y1: 1, yref: 'paper',
-          line: { color: 'rgba(30,58,95,0.35)', width: 1.5, dash: 'dot' } }] : [];
+        const marker = year ? [{
+          type: 'line',
+          x0: year,
+          x1: year,
+          y0: 0,
+          y1: 1,
+          yref: 'paper', // makes 1 highest
+          line: { // animated line
+            color: '#FFFFFF40',
+            width: 2,
+            dash: 'dot' }
+        }] : [];
         if (extendedRendered) Plotly.relayout('chart-timeseries', { shapes: marker });
         Plotly.relayout('chart-timeseries-bl', { shapes: marker });
         updateDashCharts();
       },
     });
 
-    renderMigrationTypen('chart-migration-typen');
     renderTimeseriesBundeslaender('chart-timeseries-bl');
     updateDashCharts();
   }
 
   initDashboard();
-
   let extendedRendered = false;
+
   function revealExtended() {
     if (extendedRendered) return;
     extendedRendered = true;
@@ -284,15 +289,16 @@
     renderTimeseries('chart-timeseries');
     renderJahresvergleich('chart-jahresvergleich');
     renderMigrationTypenZeitreihe('chart-migration-typen-zeitreihe');
-    renderStaatsbuergerschaft('chart-staatsbuergerschaft', dashYear);
+    renderStaatsbuergerschaft('chart-staatsbuergerschaft');
   }
 
   const observer = new IntersectionObserver(([entry]) => {
     if (entry.isIntersecting) {
-      revealExtended();
-      observer.disconnect();
+      revealExtended(); // reveal extended when scrolled so far
+      observer.disconnect(); // stops observer
     }
-  }, { rootMargin: '0px 0px -50% 0px', threshold: 0 });
+  }, { rootMargin: '0px 0px -50% 0px', threshold: 0 }); // when at least one pixel is at the 50% mark of the viewport
   observer.observe(document.getElementById('scroll-hint'));
+
 </script>
 {% endblock %}

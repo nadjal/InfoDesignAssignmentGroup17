@@ -1,10 +1,9 @@
-Möchtest du die Wanderungsbewegungen zwischen zwei Bundesländern genauer analysieren? In dieser Ansicht werden sämtliche
-Wanderungen von einem Bundesland in ein anderes dargestellt. Du kannst nachvollziehen, aus welcher Gemeinde eines 
-Bundeslandes Menschen weggezogen sind und in welche Gemeinden des anderen Bundeslandes sie gezogen sind.
+Analyze migration flows between two federal states or within a single federal state. The tool provides detailed 
+insights into internal migration patterns, showing from which municipalities residents moved and in which 
+municipalities they subsequently settled.
 
-Für eine detaillierte Analyse werden zusätzlich Informationen zum Geschlecht sowie zur Staatsangehörigkeit 
-angezeigt. Über die Filter kannst du die Ergebnisse gezielt auf Frauen oder Männer sowie auf österreichische
-Staatsbürger oder Personen ohne österreichische Staatsbürgerschaft einschränken.
+Migration data can be filtered by gender and citizenship status, enabling targeted analyses of specific 
+population groups. Results can be viewed for individual years or for the entire observation period from 2002 to 2023,
+allowing both short-term and long-term trends to be examined.
 
-Darüber hinaus kannst du entweder ein bestimmtes Jahr auswählen oder die Daten für den gesamten Zeitraum von 
-2002 bis 2023 anzeigen lassen. Die Ergebnisse stehen anschließend auch zum Download im CSV-Format zur Verfügung.
+All displayed results can be exported in CSV format for further analysis and reporting.

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Gemeinde-Explorer – Binnenmigration Österreich{% endblock %}
+{% block title %}Municipality-Explorer – Internal Migration Austria{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -8,12 +8,12 @@
 
 {% block content %}
 <div class="gem-section container">
-  <div class="page-title" style="text-align:left;">Gemeinde-Explorer</div>
-  <div class="page-sub" style="text-align:left; margin-bottom:1rem;">Wanderungsbewegungen für eine einzelne Gemeinde</div>
+  <div class="page-title" style="text-align:left;">Municipality-Explorer</div>
+  <div class="page-sub" style="text-align:left; margin-bottom:1rem;">Migration Flows for a Single Municipality</div>
   {% if content_intro %}
   <div class="prose" style="margin-bottom:1.5rem;">{{ content_intro | safe }}</div>
   {% endif %}
-  <p class="gem-map-label">Wähle deine Gemeinde auf der Karte aus</p>
+  <p class="gem-map-label">Choose a municipality on the map</p>
 
   <!-- Gemeinde-Choropleth-Karte -->
   <div class="gem-map-wrap">
@@ -22,7 +22,7 @@
     <div id="gem-map-tooltip" class="chart-tooltip"></div>
   </div>
 
-  <p class="gem-map-label">Oder suche direkt nach deiner Gemeinde</p>
+  <p class="gem-map-label">Or search directly for your municipality</p>
 
   <div class="search-wrap gem-search-wrap">
     <input type="text" id="gemeinde-input" class="search-input"
@@ -38,13 +38,13 @@
         <div class="year-bar" style="margin-bottom:1.25rem;">
             <div class="container">
                 <div class="year-bar-inner">
-                    <span class="control-label">Jahr</span>
+                    <span class="control-label">Year</span>
                     <button class="year-step-btn" id="gem-btn-prev" title="Vorheriges Jahr">‹</button>
                     <span class="year-display" id="gem-year-display">—</span>
                     <input type="range" id="gem-year-slider" class="year-range" min="0" max="0" value="0">
                     <button class="year-step-btn" id="gem-btn-next" title="Nächstes Jahr">›</button>
                     <button class="year-play-btn" id="gem-btn-play" title="Animation">▶</button>
-                    <button class="chip chip-btn" id="gem-btn-all">Alle Jahre</button>
+                    <button class="chip chip-btn" id="gem-btn-all">All years</button>
                 </div>
             </div>
         </div>
@@ -53,16 +53,16 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Wohin ziehen Personen?</div>
-              <div class="card-subtitle" id="nach-subtitle">Top-5 Zielgemeinden (alle Jahre)</div>
+              <div class="card-title">Where do people move?</div>
+              <div class="card-subtitle" id="nach-subtitle">Top-5 Destination Municipalities (All Years)</div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead><tr>
-                <th>Gemeinde</th>
-                <th>Bundesland</th>
-                <th class="num">Anzahl</th>
+                <th>municipality</th>
+                <th>federal state</th>
+                <th class="num">amount</th>
               </tr></thead>
               <tbody id="top-nach-body"></tbody>
             </table>
@@ -72,16 +72,16 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Woher kommen Personen?</div>
-              <div class="card-subtitle" id="von-subtitle">Top-5 Quellgemeinden (alle Jahre)</div>
+              <div class="card-title">Where do people come from? </div>
+              <div class="card-subtitle" id="von-subtitle">Top-5 Origin Municipalities (All Years)</div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead><tr>
-                <th>Gemeinde</th>
-                <th>Bundesland</th>
-                <th class="num">Anzahl</th>
+                <th>municipality</th>
+                <th>federal state</th>
+                <th class="num">amount</th>
               </tr></thead>
               <tbody id="top-von-body"></tbody>
             </table>
@@ -168,8 +168,8 @@
     const data = await fetchJSON(url);
     const yearLabel = gemYear ? `Jahr ${gemYear}` : 'alle Jahre';
 
-    document.getElementById('nach-subtitle').textContent = `Top-5 Zielgemeinden für ${name} (${yearLabel})`;
-    document.getElementById('von-subtitle').textContent  = `Top-5 Quellgemeinden für ${name} (${yearLabel})`;
+    document.getElementById('nach-subtitle').textContent = `Top-5 Destination Municipalities for ${name} (${yearLabel})`;
+    document.getElementById('von-subtitle').textContent  = `Top-5 Origin Municipalities for ${name} (${yearLabel})`;
     document.getElementById('top-nach-body').innerHTML   = renderTopRows(data.top_nach);
     document.getElementById('top-von-body').innerHTML    = renderTopRows(data.top_von);
     document.getElementById('gemeinde-results').style.display = 'block';
@@ -276,8 +276,8 @@
 
     wrap.innerHTML = `
       <div class="pict-header">
-        <span class="pict-title" style="color:#c51b7d">Wegzüge: ${totalW.toLocaleString('de-AT')}</span>
-        <span class="pict-title" style="color:#4d9221">Zuzüge: ${totalZ.toLocaleString('de-AT')}</span>
+        <span class="pict-title" style="color:#c51b7d">Out-Migration: ${totalW.toLocaleString('de-AT')}</span>
+        <span class="pict-title" style="color:#4d9221">In-Migration: ${totalZ.toLocaleString('de-AT')}</span>
       </div>
       <div class="pict-body">
         <svg class="pict-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
@@ -286,7 +286,7 @@
           <line x1="${lineX}" y1="0" x2="${lineX}" y2="${svgH-20}"
                 stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
           <text x="${svgW/2}" y="${svgH-4}" text-anchor="middle"
-                fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 Figur = 5 %</text>
+                fill="#64748b" font-size="28" font-family="Inter,sans-serif">1 figure = 5 %</text>
         </svg>
       </div>`;
 

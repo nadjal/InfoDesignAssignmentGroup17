@@ -4,30 +4,30 @@
 
   /* Bundesland-Name aus GKZ-Präfix (erste Stelle) */
   const GKZ_BL = {
-    '1': 'Burgenland',      '2': 'Kärnten',
-    '3': 'Niederösterreich','4': 'Oberösterreich',
-    '5': 'Salzburg',        '6': 'Steiermark',
-    '7': 'Tirol',           '8': 'Vorarlberg',
-    '9': 'Wien',
+    '1': 'Burgenland',      '2': 'Carinthia',
+    '3': 'Lower Austria','4': 'Oberösterreich',
+    '5': 'Salzburg',        '6': 'Styria',
+    '7': 'Tyrol',           '8': 'Vorarlberg',
+    '9': 'Vienna',
   };
 
   /* Farbe pro Bundesland (Chart-Step) */
   const BL_COLOR = {
-    'Wien':             '#1E3A5F',
-    'Niederösterreich': '#0EA5E9',
-    'Oberösterreich':   '#10B981',
-    'Steiermark':       '#6366F1',
-    'Tirol':            '#F59E0B',
+    'Vienna':             '#1E3A5F',
+    'Lower Austria': '#0EA5E9',
+    'Upper Austria':   '#10B981',
+    'Styria':       '#6366F1',
+    'Tyrol':            '#F59E0B',
     'Salzburg':         '#EC4899',
     'Burgenland':       '#14B8A6',
-    'Kärnten':          '#F97316',
+    'Carinthia':          '#F97316',
     'Vorarlberg':       '#8B5CF6',
   };
 
   /* Reihenfolge Y-Achse (annähernd nach Netto-Zuzug absteigend) */
   const BL_ORDER = [
-    'Wien', 'Niederösterreich', 'Oberösterreich', 'Steiermark',
-    'Tirol', 'Salzburg', 'Vorarlberg', 'Kärnten', 'Burgenland',
+    'Vienna', 'Lower Austria', 'Upper Austria', 'Styria',
+    'Tyrol', 'Salzburg', 'Vorarlberg', 'Carinthia', 'Burgenland',
   ];
 
   /* ISO-Codes (3-stellige GKZ-Präfixe) der Landeshauptstädte — kein Wien */
@@ -81,7 +81,7 @@
     const el = document.getElementById('story-legend');
     if (!el) return;
     el.innerHTML =
-      `<div class="leg-title">Netto-Migration</div>` +
+      `<div class="leg-title">Net-Migration</div>` +
       `<div class="leg-bar">` +
         `<span class="leg-lbl leg-lbl-left">${fmt(_dataMin)}</span>` +
         `<span class="leg-grad" style="background:${storyGradient()}"></span>` +
@@ -366,7 +366,7 @@
     function showTip(event, d) {
       if (!tip) return;
       const sign = d.netto >= 0 ? '+' : '';
-      tip.innerHTML = `<strong>${d.name}</strong><br>Netto: ${sign}${fmt(d.netto)}`;
+      tip.innerHTML = `<strong>${d.name}</strong><br>Net: ${sign}${fmt(d.netto)}`;
       tip.style.opacity = '1';
       moveTip(event);
     }
@@ -455,7 +455,7 @@
       .attr('fill',        '#64748b')
       .attr('font-size',   '11px')
       .attr('font-family', 'Inter, sans-serif')
-      .text('Netto-Migration pro Bezirk (Zuzug − Wegzug)');
+      .text('Net-Migration per District (In-Migration - Out-Migration)');
 
     /* Y-Labels (Bundesland-Namen) — neutral, da Farbe den Wert codiert */
     BL_ORDER.forEach(bl => {
@@ -493,7 +493,7 @@
           .on('mouseover', function (event) {
             if (!tip) return;
             const sign = bl.netto >= 0 ? '+' : '';
-            tip.innerHTML = `<strong>${bl.name}</strong><br>Ø Netto/Bezirk: ${sign}${fmt(bl.netto)}`;
+            tip.innerHTML = `<strong>${bl.name}</strong><br>Ø Net per District: ${sign}${fmt(bl.netto)}`;
             tip.style.opacity = '1';
             const pr = document.getElementById(_mapId).parentElement.getBoundingClientRect();
             tip.style.left = (event.clientX - pr.left + 14) + 'px';
@@ -815,7 +815,7 @@
         wegzug: blAgg[name] ? blAgg[name].wegzug : 0,
       }));
     } catch (e) {
-      console.error('[Scrollytelling] Bezirk-Daten konnten nicht geladen werden:', e);
+      console.error('[Scrollytelling] District data could not be loaded:', e);
       if (loadEl) loadEl.style.display = 'none';
       return;
     }
@@ -824,7 +824,7 @@
     /* Leaflet-Karte aus der zentralen Registry holen */
     _map = (typeof _leafletMaps !== 'undefined') && _leafletMaps[mapId]?.map;
     if (!_map) {
-      console.error('[Scrollytelling] Karte nicht gefunden:', mapId);
+      console.error('[Scrollytelling] Map not found:', mapId);
       return;
     }
 

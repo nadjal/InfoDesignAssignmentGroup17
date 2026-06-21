@@ -1,16 +1,14 @@
+Where do people move to, and where do newcomers come from? The Municipality Explorer makes migration flows 
+between Austrian municipalities visible and provides detailed insights into local population dynamics from 
+2002 to 2023.
 
-Wohin ziehen die Menschen aus deiner Gemeinde – und woher kommen die Neuzuzüge? Der Gemeindexplorer macht
-Wanderungsbewegungen zwischen österreichischen Gemeinden sichtbar und ermöglicht einen detaillierten Blick 
-auf die Bevölkerungsentwicklung von 2002 bis 2023.
+Population analysis is particularly important at the municipal level. Each year, municipalities and spatial 
+planners assess how the local population has evolved in order to support informed planning and decision-making. 
+These insights provide an important foundation for urban and regional development and help ensure that housing, 
+infrastructure, and public services can be adapted to the needs of the population.
 
-Bevölkerungsanalysen spielen insbesondere auf Gemeindeebene eine wichtige Rolle. Jedes Jahr wird gemeinsam mit 
-der örtlichen Raumplanung untersucht, wie sich die Bevölkerung einer Gemeinde entwickelt hat. Diese Erkenntnisse 
-bilden eine wichtige Grundlage für die Orts- und Stadtentwicklung und helfen dabei, Wohnraum, Infrastruktur und 
-öffentliche Einrichtungen an die Bedürfnisse der Bevölkerung anzupassen.
-
-Mit dem Gemeindexplorer können Wanderungsbewegungen einzelner Gemeinden im Detail analysiert werden. Wähle 
-eine Gemeinde auf der Karte aus und entdecke, aus welchen Gemeinden die meisten Menschen zuziehen und in
-welche Gemeinden sie wegziehen. Die Daten können sowohl für einzelne Jahre als auch für den gesamten 
-Zeitraum von 2002 bis 2023 betrachtet werden. Vergleiche verschiedene Jahre miteinander und erkenne, wie sich Wanderungsströme im Laufe der Zeit verändern.
-So erhältst du einen umfassenden Einblick in die Bevölkerungsdynamik österreichischer Gemeinden und die
-Entwicklungen, die ihre Zukunft prägen.
+With the Municipality Explorer, migration patterns can be analyzed in detail for individual municipalities. Select a
+municipality on the map to discover where incoming residents come from and where outgoing residents relocate. Data can 
+be explored for individual years or across the entire observation period from 2002 to 2023. Compare different years,
+identify changing migration patterns over time, and gain a deeper understanding of the demographic dynamics shaping 
+Austria’s municipalities.

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Karte – Binnenmigration Österreich{% endblock %}
+{% block title %}Map - Internal Migration Austria{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -10,20 +10,20 @@
 
 {% block content %}
 <div class="karte-intro container">
-  <h1 class="karte-intro-title">Wo zieht Österreich hin?</h1>
+  <h1 class="karte-intro-title">Where do Austrians move to?</h1>
   <p>
-    Jedes Jahr wechseln Hunderttausende Menschen ihren Wohnort innerhalb von Österreich – von der Stadt aufs Land, von West nach Ost
-    oder in die nächste Großstadt. Diese interaktive Karte macht diese Wanderungsbewegungen sichtbar: auf
-    Bundesland- und Bezirksebene, für einzelne Jahre oder über den gesamten Beobachtungszeitraum hinweg. Während
-    manche Regionen ein starkes Bevölkerungswachstum verzeichnen, sind andere von Abwanderung betroffen.
+    Every year, hundreds of thousands of people change their place of residence within Austria — moving from urban
+    areas to rural regions, from west to east, or to one of the country’s major cities. This interactive map visualizes
+    these migration movements at the federal state and district levels, for individual years or across the entire
+    observation period. While some regions experience strong population growth, others are affected by population
+    decline due to out-migration.
 
   </p>
   <p>
-    Wähle ein Jahr aus, um zu sehen, wie sich die Wanderungsbewegungen verändert haben.
-    Die Daten zeigen die <strong>Netto-Migration</strong> — also die Differenz zwischen
-    Zu- und Wegzug.
-    <span class="highlight-green">Grüne Flächen</span> gewinnen Einwohner:innen,
-    <span class="highlight-red">pinke Flächen</span> verlieren sie.
+    Select a year to explore how migration patterns have changed over time.
+    The data displays <strong>net-migration</strong> — the difference between in-migration and out-migration.
+    <span class="highlight-green">green areas</span> indicate population gains, while
+    <span class="highlight-red">pink areas</span> indicate population losses.
   </p>
   <div class="karte-year-row">
     <span class="karte-year-label">Jahr:</span>
@@ -52,13 +52,13 @@
 
     <div class="scroll-step" data-step="map">
       <div class="step-card">
-        <div class="step-num">01 — Überblick</div>
-        <h2>Wer zieht wohin?</h2>
-        <p>Jährlich wechseln über <strong>200.000 Menschen</strong> in Österreich
-           ihren Wohnort. Die Karte zeigt die Netto-Migration nach Bundesland —
-           <span class="highlight-green">grüne Flächen</span> gewinnen
-           Einwohner:innen, <span class="highlight-red">pinke Flächen</span>
-           verlieren sie.</p>
+        <div class="step-num">01 — Overview</div>
+        <h2>Where Do People Move?</h2>
+        <p>Every year, more than <strong>200.000 Menschen</strong> in Austria change their place of residence.
+          The map shows net migration by federal state -
+           <span class="highlight-green">green areas</span> gain population, while
+            <span class="highlight-red">pink areas</span>
+           experience population loss.</p>
       </div>
     </div>
 

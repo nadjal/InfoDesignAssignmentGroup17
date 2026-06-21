@@ -1,11 +1,19 @@
 > **Placeholder** — Replace this file with your introduction text for the dashboard page.
 
-## Binnenwanderungen in Österreich
+## Internal Migration in Austria
 
-Während die Wanderungen in und aus dem Ausland große mediale Aufmerksamkeit bekommen, werden die Wanderungen innerhalb Österreich - die so genannten Binnenwanderungen - weniger beachtet.
+While international migration often receives considerable public and media attention, migration movements within 
+Austria—referred to as internal migration—tend to receive less attention.
 
-Dabei wirken sich die Binnenwanderungen insbesondere bei kleineren Gemeinden wesentlich auf die Einwohner:innenzahl aus.
+Nevertheless, internal migration is a key driver of regional population change. Particularly in smaller 
+municipalities, migration gains and losses can have a significant impact on population development, settlement patterns, and local planning needs.
 
-Die Einwohner:innenzahl einer Gemeinde verändert sich einerseits durch Geburten und Todesfälle, andererseits durch die Wanderungen mit dem Ausland, und letzlich auch durch die Binnenwanderungen.
+The population of a municipality changes through three main components: births and deaths, international 
+migration, and internal migration within Austria. Understanding internal migration patterns therefore provides
+valuable insights into demographic change, spatial development, and regional dynamics.
 
-Data source: [Statistik Austria](https://www.statistik.at), Binnenwanderungsstatistik.
+This dashboard provides an interactive overview of internal migration in Austria. Explore migration flows, 
+net migration balances, demographic characteristics, and long-term trends across municipalities, districts, 
+and federal states over the period 2002–2023.
+
+Data source: [Statistik Austria](https://www.statistik.at), Internal Migration Statistics.

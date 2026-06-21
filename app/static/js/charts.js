@@ -55,10 +55,10 @@ function lay(overrides) {
 
 /* ── Utilities ────────────────────────────────────────────────────── */
 function loading(el) {
-  el.innerHTML = '<div class="loading"><div class="spinner"></div>Lade Daten …</div>';
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading data …</div>';
 }
 
-function errState(el, msg = 'Keine Daten verfügbar.') {
+function errState(el, msg = 'No data available.') {
   el.innerHTML = `<div class="error-state"><p>${msg}</p></div>`;
 }
 
@@ -105,7 +105,7 @@ function initYearSlider({ years, sliderId, displayId, btnAllId, btnPrevId, btnPl
   function applyYear(year) {
     current = year;
     slider.value = year !== null ? years.indexOf(year) : years.length;
-    display.textContent = year !== null ? year : 'Alle';
+    display.textContent = year !== null ? year : 'All';
     if (btnAll)  btnAll.classList.toggle('active', year === null);
     if (btnPrev) btnPrev.disabled = year === years[0];
     if (btnNext) btnNext.disabled = year === null;
@@ -154,7 +154,7 @@ async function initOverview() {
     if (total) animateCounter(total, d.total_migrations);
     if (years) {
       const span = d.year_max - d.year_min + 1;
-      animateCounter(years, span, ' Jahre');
+      animateCounter(years, span, ' Years');
       if (range) range.textContent = `${d.year_min} – ${d.year_max}`;
     }
     if (gem) animateCounter(gem, d.gemeinden_count);
@@ -165,9 +165,9 @@ async function initOverview() {
 
 /* ── Migrationstypen (Pie) ────────────────────────────────────────── */
 const MIGRATION_TYPEN = [
-  { key: 'innerhalb_bundesland',   label: 'Innerhalb Bundesland',   color: '#34D399' },
-  { key: 'innerhalb_gemeinde',     label: 'Innerhalb Gemeinde',     color: '#FACC15' },
-  { key: 'zwischen_bundeslaender', label: 'Zwischen Bundesländern', color: '#60A5FA' },
+  { key: 'innerhalb_bundesland',   label: 'Within Federal State',   color: '#34D399' },
+  { key: 'innerhalb_gemeinde',     label: 'Within Municipality',     color: '#FACC15' },
+  { key: 'zwischen_bundeslaender', label: 'Between Federal States', color: '#60A5FA' },
 ];
 let _migrationTypenData = null;
 
@@ -190,7 +190,7 @@ async function renderMigrationTypen(id, year = null) {
       _migrationTypenData = await fetchJSON('/api/migration_typen');
     }
     const row = _migrationTypenRow(year);
-    if (!row) { errState(el, 'Keine Daten für dieses Jahr.'); return; }
+    if (!row) { errState(el, 'No data available for this year.'); return; }
 
     const values = MIGRATION_TYPEN.map(t => row[t.key] || 0);
 
@@ -206,7 +206,7 @@ async function renderMigrationTypen(id, year = null) {
         textposition: 'outside',
         textfont: { size: 11, color: 'white' },
         automargin: true,
-        hovertemplate: '<b>%{label}</b><br>%{value:,.0f} Personen<br>%{percent}<extra></extra>',
+        hovertemplate: '<b>%{label}</b><br>%{value:,.0f} people <br>%{percent}<extra></extra>',
         marker: { colors: MIGRATION_TYPEN.map(t => t.color), line: { color: '#1a2535', width: 2 } },
       }], {
         paper_bgcolor: 'transparent',
@@ -238,7 +238,7 @@ async function renderTimeseries(id, highlightYear = null) {
       x: years, y: totals,
       type: 'scatter', mode: 'none',
       fill: 'tozeroy', fillcolor: 'rgba(14,165,233,0.06)',
-      name: 'Gesamt', showlegend: false, hoverinfo: 'skip',
+      name: 'Total', showlegend: false, hoverinfo: 'skip',
     });
 
     const DARK_LINE_COLORS = ['#FB923C', '#60A5FA'];
@@ -251,7 +251,7 @@ async function renderTimeseries(id, highlightYear = null) {
         type: 'scatter', mode: 'lines+markers',
         line: { width: 2.5, shape: 'spline', smoothing: 0.4, color },
         marker: { size: 5, color },
-        hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+        hovertemplate: '<b>%{y:,.0f}</b> people <extra>%{fullData.name}</extra>',
       });
       traces.push({
         x: [null], y: [null], name: g, showlegend: true, legendgroup: g,
@@ -263,10 +263,10 @@ async function renderTimeseries(id, highlightYear = null) {
 
     traces.push({
       x: years, y: totals,
-      name: 'Gesamt',
+      name: 'Total',
       type: 'scatter', mode: 'lines',
       line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
-      hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
+      hovertemplate: '<b>%{y:,.0f}</b> total<extra></extra>',
     });
 
     const shapes = highlightYear ? [{
@@ -295,7 +295,7 @@ async function renderAltersgruppen(id, year = null) {
   try {
     const url = year ? `/api/altersgruppen?year=${year}` : '/api/altersgruppen';
     const data = await fetchJSON(url);
-    if (!data.length) { errState(el, 'Keine Daten für dieses Jahr.'); return; }
+    if (!data.length) { errState(el, 'No data available for this year.'); return; }
 
     const groups = data.map(d => d.altersgruppe);
     const traces = MIGRATION_TYPEN.map(t => ({
@@ -314,7 +314,7 @@ async function renderAltersgruppen(id, year = null) {
       margin:       { t: 16, r: 16, b: 48, l: 130 },
       xaxis: {
         tickformat: ',.0f',
-        title: { text: 'Wanderungen', font: { size: 11, color: 'white' } },
+        title: { text: 'Migrations', font: { size: 11, color: 'white' } },
         gridcolor: 'rgba(255,255,255,0.08)',
         zerolinecolor: 'rgba(255,255,255,0.15)',
       },
@@ -337,8 +337,8 @@ async function renderStaatsbuergerschaft(id) {
     const years   = [...new Set(data.map(d => d.jahr))].sort();
     const staaten = [...new Set(data.map(d => d.staatsbuergerschaft))];
     const STAAT_LABELS = {
-      'Inländer':  'österr.<br>Staatsbürgerschaft',
-      'Ausländer': 'keine österr.<br>Staatsbürgerschaft',
+      'Inländer':  'Austrian<br>Citizenship',
+      'Ausländer': 'Non-Austrian<br>Citizenship',
     };
 
     const totals = years.map(y =>
@@ -351,7 +351,7 @@ async function renderStaatsbuergerschaft(id) {
       x: years, y: totals,
       type: 'scatter', mode: 'none',
       fill: 'tozeroy', fillcolor: 'rgba(14,165,233,0.06)',
-      name: 'Gesamt', showlegend: false, hoverinfo: 'skip',
+      name: 'total', showlegend: false, hoverinfo: 'skip',
     });
 
     staaten.forEach((s, i) => {
@@ -364,7 +364,7 @@ async function renderStaatsbuergerschaft(id) {
         type: 'scatter', mode: 'lines+markers',
         line:   { width: 2.5, shape: 'spline', smoothing: 0.4, color },
         marker: { size: 5, color },
-        hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+        hovertemplate: '<b>%{y:,.0f}</b> people<extra>%{fullData.name}</extra>',
       });
       traces.push({
         x: [null], y: [null], name: label, showlegend: true, legendgroup: s,
@@ -376,10 +376,10 @@ async function renderStaatsbuergerschaft(id) {
 
     traces.push({
       x: years, y: totals,
-      name: 'Gesamt',
+      name: 'total',
       type: 'scatter', mode: 'lines',
       line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
-      hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
+      hovertemplate: '<b>%{y:,.0f}</b> total<extra></extra>',
     });
 
     Plotly.newPlot(el, traces, lay({
@@ -401,7 +401,7 @@ async function renderSankey(id, year = null) {
   try {
     const url = year ? `/api/sankey?year=${year}` : '/api/sankey';
     const d = await fetchJSON(url);
-    if (!d.bundeslaender || !d.flows.length) { errState(el, 'Keine Flussdaten verfügbar.'); return; }
+    if (!d.bundeslaender || !d.flows.length) { errState(el, 'No flow data available.'); return; }
 
     const bls = [...d.bundeslaender].sort();
     const n   = bls.length;
@@ -434,7 +434,7 @@ async function renderSankey(id, year = null) {
         target: d.flows.map(f => tgtIdx[f.nach]),
         value:  d.flows.map(f => f.total),
         color:  d.flows.map(f => rgba(colorOf[f.von], 0.3)),
-        hovertemplate: 'Von: %{source.label}<br>Nach: %{target.label}<br>Anzahl: <b>%{value:,.0f}</b><extra></extra>',
+        hovertemplate: 'From: %{source.label}<br>To: %{target.label}<br>Count: <b>%{value:,.0f}</b><extra></extra>',
       },
     }], {
       paper_bgcolor: 'transparent',
@@ -462,23 +462,23 @@ async function renderJahresvergleich(id) {
         x: years, y: totals,
         type: 'scatter', mode: 'none',
         fill: 'tozeroy', fillcolor: 'rgba(96,165,250,0.15)',
-        name: 'Wanderungen', showlegend: false, hoverinfo: 'skip',
+        name: 'Migrations', showlegend: false, hoverinfo: 'skip',
       },
       {
         x: years, y: totals,
         type: 'scatter', mode: 'lines+markers',
         line: { width: 2.5, shape: 'spline', smoothing: 0.4, color: '#60A5FA' },
         marker: { size: 5, color: '#60A5FA' },
-        name: 'Wanderungen', showlegend: false,
-        hovertemplate: '<b>%{x}</b><br>%{y:,.0f} Wanderungen<extra></extra>',
+        name: 'Migrations', showlegend: false,
+        hovertemplate: '<b>%{x}</b><br>%{y:,.0f} Migrations<extra></extra>',
       },
       {
         x: [years[0], years[years.length - 1]],
         y: [avg, avg],
         type: 'scatter', mode: 'lines',
         line: { color: 'rgba(255,255,255,0.5)', width: 2, dash: 'dot' },
-        name: `Ø ${fmt(avg)} / Jahr`,
-        hovertemplate: `Durchschnitt: <b>${fmt(avg)}</b><extra></extra>`,
+        name: `Ø ${fmt(avg)} / Year`,
+        hovertemplate: `Average: <b>${fmt(avg)}</b><extra></extra>`,
       },
     ], lay({
       plot_bgcolor: '#1a2535',
@@ -519,7 +519,7 @@ async function renderMigrationTypenZeitreihe(id) {
         type: 'scatter', mode: 'lines+markers',
         line:   { width: 2.5, shape: 'spline', smoothing: 0.4, color },
         marker: { size: 5, color },
-        hovertemplate: '<b>%{y:,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+        hovertemplate: '<b>%{y:,.0f}</b> people<extra>%{fullData.name}</extra>',
       });
       traces.push({
         x: [null], y: [null], name: t.label, showlegend: true, legendgroup: t.key,
@@ -531,10 +531,10 @@ async function renderMigrationTypenZeitreihe(id) {
 
     traces.push({
       x: years, y: totals,
-      name: 'Gesamt',
+      name: 'total',
       type: 'scatter', mode: 'lines',
       line: { width: 2, dash: 'dot', color: 'rgba(255,255,255,0.4)' },
-      hovertemplate: '<b>%{y:,.0f}</b> gesamt<extra></extra>',
+      hovertemplate: '<b>%{y:,.0f}</b> total<extra></extra>',
     });
 
     Plotly.newPlot(el, traces, lay({
@@ -577,7 +577,7 @@ async function renderTimeseriesBundeslaender(id) {
       type: 'scatter', mode: 'lines+markers',
       line:   { width: 2.5, shape: 'spline', smoothing: 0.4, color: BL_COLORS[i % BL_COLORS.length] },
       marker: { size: 5, color: BL_COLORS[i % BL_COLORS.length] },
-      hovertemplate: '<b>%{y:+,.0f}</b> Personen<extra>%{fullData.name}</extra>',
+      hovertemplate: '<b>%{y:+,.0f}</b> people<extra>%{fullData.name}</extra>',
     }));
 
     Plotly.newPlot(el, traces, lay({
@@ -654,7 +654,7 @@ function _tooltipContent(name, d) {
 }
 
 function _addLegend(map, metric, maxAbs) {
-  const TITLES = { netto: 'Netto-Migration', zuzug: 'Zuzug', wegzug: 'Wegzug' };
+  const TITLES = { netto: 'Net Migration', zuzug: 'In-Migration', wegzug: 'Out-Migration' };
   const grad   = metric === 'netto'
     ? 'linear-gradient(to right,#D73027,#F7F7F7,#4575B4)'
     : 'linear-gradient(to right,#EFF6FF,#1E3A5F)';
@@ -852,10 +852,10 @@ function renderGeoMap(id, data, metric = 'netto') {
     customdata: data.map(d => [d.zuzug, d.ausziehend, d.netto, d.total]),
     hovertemplate:
       '<b>%{text}</b><br>' +
-      'Zuzug:  %{customdata[0]:,.0f}<br>' +
-      'Wegzug: %{customdata[1]:,.0f}<br>' +
-      'Netto:  %{customdata[2]:,.0f}<br>' +
-      'Gesamt: %{customdata[3]:,.0f}' +
+      'In-Migration:  %{customdata[0]:,.0f}<br>' +
+      'Out-Migration: %{customdata[1]:,.0f}<br>' +
+      'Net:  %{customdata[2]:,.0f}<br>' +
+      'Total: %{customdata[3]:,.0f}' +
       '<extra></extra>',
   }], {
     paper_bgcolor: 'transparent',
